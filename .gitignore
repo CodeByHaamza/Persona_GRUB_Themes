@@ -1,0 +1,216 @@
+# ============================================
+# SCRIPTS ET FICHIERS DE DÉVELOPPEMENT
+# ============================================
+scripts/
+test/
+prev.py
+tree.txt
+
+# Scripts de développement dans themes/
+themes/change_colors.py
+themes/copy_select_images.sh
+themes/generate_theme_txt.sh
+
+# ============================================
+# PYTHON
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+env.bak/
+venv.bak/
+pyvenv.cfg
+
+# ============================================
+# IDE ET ÉDITEURS
+# ============================================
+# VSCode
+.vscode/
+.vscode-server/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Visual Studio
+.vs/
+.vscode-test/
+
+# Vim
+*.swp
+*.swo
+*~
+.*.sw?
+.netrwhist
+
+# Emacs
+\#*\#
+.\#*
+*~
+
+# ============================================
+# SYSTÈME D'EXPLOITATION
+# ============================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ============================================
+# FICHIERS TEMPORAIRES
+# ============================================
+temp_*/
+tmp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*.log
+*.cache
+
+# GRUB/QEMU temporaires
+*.iso
+*.ppm
+*.img
+temp_joker_fix/
+temp_grub_preview/
+
+# ============================================
+# FICHIERS DE TEST
+# ============================================
+test_output/
+test_images/
+test_themes/
+*_test/
+*.test
+
+# ============================================
+# FICHIERS SENSIBLES
+# ============================================
+.env
+.env.local
+.env.*.local
+secrets.txt
+credentials.json
+config.local.json
+*.key
+*.pem
+*.cert
+
+# ============================================
+# DOCUMENTATION LOCALE
+# ============================================
+# Garde seulement le README principal
+docs/draft/
+notes.txt
+TODO.txt
+NOTES.md
+
+# ============================================
+# ASSETS DE DÉVELOPPEMENT
+# ============================================
+# Fichiers sources non compressés
+*.psd
+*.ai
+*.sketch
+*.xcf
+
+# Fichiers de backup d'images
+*_backup.png
+*_old.png
+*_draft.png
+
+# ============================================
+# LOGS ET RAPPORTS
+# ============================================
+*.log
+logs/
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ============================================
+# AUTRES
+# ============================================
+# Dossiers de build
+out/
+target/
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Patches
+*.patch
+*.diff

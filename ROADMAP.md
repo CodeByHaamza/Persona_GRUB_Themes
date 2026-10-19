@@ -169,6 +169,7 @@ All P5X backgrounds carry the Chinese logo and the `©[2023] Perfect World` line
 ### 3.3 Persona 3 Reload
 - [ ] All party members are in. Re-source `shinji`, `kotone`, `fuuka`.
 - [ ] **Kotone Shiomi** (P3 female protagonist, not Kotone Montagne / Mont from P5X): no need for the P3P FeMC mod anymore. She is in Persona 5: The Phantom X, so her official All-Out Attack is extracted from P5X. The theme **stays in `persona3_reload/`**; `SOURCES.md` notes that the image comes from P5X.
+- [ ] **Fuuka**: she is also in Persona 5: The Phantom X → extract her official All-Out Attack from P5X. The current background is 1000×430 and stretched, so this is a big upgrade. The theme stays in `persona3_reload/`.
 - [ ] Same idea for other characters that appear in several games: the theme stays in its original game, and the image comes from whichever game has the best official All-Out Attack.
 - [ ] **Episode Aigis**: check for AOA finishers that differ from the base game.
 
@@ -438,6 +439,7 @@ These items need files or actions that are not in the repository. Each one shoul
 
 ### Needs the images (official All-Out Attacks only)
 - [ ] **Kotone Shiomi** (P3 female protagonist) from P5X (stays in `persona3_reload/`, see [3.3](#33-persona-3-reload)).
+- [ ] **Fuuka** from P5X (stays in `persona3_reload/`, see [3.3](#33-persona-3-reload)).
 - [ ] **Re-source the 13 stretched themes** ([1.2](#12-wrong-aspect-ratio--stretched-characters)) with 16:9 versions of the same AOA.
 - [ ] **Re-source the low-res backgrounds** ([1.1](#11-backgrounds-below-19201080)): P5X from the Global game files, P3R `shinji` / `kotone` / `fuuka`, P5R `black_mask` / `caroline_justine` / `lavenza`.
 - [ ] **New P5X characters and outfits** released since the last update, each with its official AOA ([3.1](#31-persona-5-the-phantom-x)).

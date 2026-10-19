@@ -157,7 +157,41 @@ All P5X backgrounds carry the Chinese logo and the `©[2023] Perfect World` line
 > ⚠️ Everything in this section follows the [Golden Rule](#-golden-rule-official-all-out-attacks-only): **a character is added only once its official All-Out Attack finisher image is found and linked.** The lists below are leads to check, not confirmed additions.
 
 ### 3.1 Persona 5: The Phantom X
-- [ ] List every playable character and outfit released since the last update of this repo (check the up-to-date P5X Global character list).
+
+**Reference list:** [personadle / allOutAttackMode](https://github.com/CodeByHaamza/personadle/tree/main/allOutAttackMode) has the official All-Out Attack of 80 characters and outfits (P3, P5, P5X). Its images are 800×450 animations, too small for GRUB, but they confirm **which official AOAs exist**, and the last frame shows which art to extract in high resolution from the game.
+
+Compared with the 68 current themes, every P3 and P5 character is already in. **12 P5X themes are missing**, all with an official AOA:
+
+| New theme | Folder | Type |
+|---|---|---|
+| Anri (Aran Hirano) | `anri` | New Phantom Idol |
+| Pinky (Narumi Nashimoto) | `pinky` | New Phantom Idol |
+| Blitz (Kumi Katayama) | `blitz` | New Phantom Idol |
+| Miku (Hatsune Miku) | `miku` | Collaboration |
+| Joker (Starlight) | `joker_starlight` | P5 character, P5X outfit |
+| Mona (Starlight) | `mona_starlight` | P5 character, P5X outfit |
+| Panther (Starlight) | `panther_starlight` | P5 character, P5X outfit |
+| Wonder (Velvet) | `wonder_velvet` | Outfit (different from Valentine) |
+| Wonder (Shujin) | `wonder_shujin` | Outfit |
+| Closer (Radiance) | `closer_radiance` | Outfit |
+| Chord (Summer) | `chord_summer` | Outfit |
+| Berry (Summer) | `berry_summer` | Outfit |
+
+The Starlight outfits come from P5X, so they go in `persona5_phantom_x/`. P5R keeps the original outfits. This brings the collection to **80 themes**.
+
+**Official outfit names:** personadle uses the official names (checked on lufel.net). Some current folders use datamine or approximate names. They are the same outfits, checked image by image:
+
+| Current folder | Official name | Proposed folder |
+|---|---|---|
+| `bui_stellar` | Bui Cosmic | `bui_cosmic` |
+| `soy_frontiere` | Soy Pioneer | `soy_pioneer` |
+| `wonder_beach`, `closer_beach`, `moko_beach`, `marian_beach`, `puppet_beach` | Summer | `*_summer` |
+| `wonder_cny`, `rin_cny` | Chinese New Year | keep (the display name is already "Chinese New Year") |
+| `wind_vast`, `mont_music` | to check (personadle files: `Wind_V`, `Mount_Ice` / `Mount_Wind`) | keep until checked |
+
+- [ ] Rename the variants to their official names (folders, previews, display names in `install.py`). Do it in one PR, before adding the new themes.
+- [ ] Add the 12 missing themes above, extracted in high resolution from P5X.
+- [ ] Keep the list up to date: each new P5X character or outfit added to personadle → a new theme here.
 - [ ] For each one, find its official AOA finisher image → add it.
 - [ ] Same for **new outfits** (seasonal, collab, event): each outfit with its own AOA becomes a variant (`<name>_<outfit>`), like the existing `wonder_beach`, `rin_cny`, etc.
 - [ ] Replace the current P5X images with their Global versions when available.
@@ -442,7 +476,8 @@ These items need files or actions that are not in the repository. Each one shoul
 - [ ] **Fuuka** from P5X (stays in `persona3_reload/`, see [3.3](#33-persona-3-reload)).
 - [ ] **Re-source the 13 stretched themes** ([1.2](#12-wrong-aspect-ratio--stretched-characters)) with 16:9 versions of the same AOA.
 - [ ] **Re-source the low-res backgrounds** ([1.1](#11-backgrounds-below-19201080)): P5X from the Global game files, P3R `shinji` / `kotone` / `fuuka`, P5R `black_mask` / `caroline_justine` / `lavenza`.
-- [ ] **New P5X characters and outfits** released since the last update, each with its official AOA ([3.1](#31-persona-5-the-phantom-x)).
+- [ ] **The 12 missing P5X themes** (Anri, Pinky, Blitz, Miku, Joker / Mona / Panther Starlight, Wonder Velvet / Shujin, Closer Radiance, Chord Summer, Berry Summer), extracted in high resolution from P5X ([3.1](#31-persona-5-the-phantom-x)).
+- [ ] **Rename the variants** to their official names (Bui Cosmic, Soy Pioneer, Summer) ([3.1](#31-persona-5-the-phantom-x)).
 - [ ] **Persona 4 Revival** on release, from its official AOAs ([3.4](#34-persona-4-revival-)).
 - [ ] Fill `SOURCES.md` with the source of every AOA image.
 
@@ -466,6 +501,6 @@ These items need files or actions that are not in the repository. Each one shoul
 3. **README fixes** + Golden Rule in Contributing + issue templates (8.1, 8.4, 8.5).
 4. **Build pipeline**: `characters.yaml` + `tools/build.py` + `shared/` (6).
 5. **CI** validation and releases (7).
-6. **New P5X characters / outfits** with official AOAs (3.1).
+6. **Rename the P5X variants**, then add the **12 missing P5X themes** (3.1).
 7. **Persona 4 Revival** on release day (3.4).
 8. Design upgrades, installer TUI, distribution, full boot experience (4, 5.5+, 9, 10).

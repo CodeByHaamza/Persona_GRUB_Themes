@@ -5,7 +5,7 @@
 ![Persona Banner](https://img.shields.io/badge/Persona-GRUB_Themes-E60012?style=for-the-badge&logo=linux&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=for-the-badge)](https://github.com/HamzaKarrouchi/Persona_GRUB_Themes/pulls)
+[![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=for-the-badge)](https://github.com/CodeByHaamza/Persona_GRUB_Themes/pulls)
 
 **Transform your GRUB bootloader into a stylish Persona experience!**
 
@@ -121,17 +121,18 @@
 
 ## ✨ Features
 
-- 🎨 **70+ Character Themes** across three Persona games
+- 🎨 **68 Character Themes** across three Persona games
 - 🎮 **Game Collections:**
-  - Persona 5 Royal (13 characters)
-  - Persona 5: The Phantom X (42+ characters)
-  - Persona 3 Reload (13 characters)
+  - Persona 5 Royal (13 themes)
+  - Persona 5: The Phantom X (42 themes, 29 characters)
+  - Persona 3 Reload (13 themes)
 - 🔧 **Easy Installation** with interactive Python script
 - 🎨 **Unique Color Scheme** for each character
 - 📦 **Multiple Installation Methods** (Script, Manual, or Grub Customizer)
-- 🖼️ **High-Quality Assets** from official game sources
+- 🃏 **Official All-Out Attack artwork** for every character
 - 🔄 **Multiple Variants** for select characters (Beach, CNY, Special editions)
-- 🐧 **Cross-Distribution Support** (Ubuntu, Debian, Arch, Fedora, and more)
+- 🐧 **Cross-Distribution Support** (Ubuntu, Debian, Arch, Fedora, openSUSE, and more)
+- ↩️ **Safe Install**: original GRUB config backed up, one-command restore
 
 ## 📋 Table of Contents
 
@@ -157,16 +158,16 @@
 ```bash
 # Ubuntu/Debian
 sudo apt update
-sudo apt install python3 python3-pil grub2-common
+sudo apt install python3 grub2-common
 
 # Fedora/RHEL
-sudo dnf install python3 python3-pillow grub2-tools
+sudo dnf install python3 grub2-tools
 
 # Arch Linux
-sudo pacman -S python python-pillow grub
+sudo pacman -S python grub
 
 # openSUSE
-sudo zypper install python3 python3-Pillow grub2
+sudo zypper install python3 grub2
 ```
 
 ### Optional Tools
@@ -181,7 +182,7 @@ sudo apt install grub-customizer
 
 1. **Clone the repository**
 ```bash
-   git clone https://github.com/HamzaKarrouchi/Persona_GRUB_Themes.git
+   git clone https://github.com/CodeByHaamza/Persona_GRUB_Themes.git
    cd Persona_GRUB_Themes
 ```
 
@@ -201,6 +202,22 @@ sudo apt install grub-customizer
    sudo reboot
 ```
 
+#### Installer options
+```bash
+sudo python3 install.py --theme joker      # install a theme directly (folder name)
+python3 install.py --list                  # list every available theme
+sudo python3 install.py --dry-run          # show what would change, touch nothing
+sudo python3 install.py --uninstall        # remove the Persona themes from GRUB
+sudo python3 install.py --restore          # restore /etc/default/grub as it was before the first install
+sudo python3 install.py --theme joker -y   # no questions (scripts)
+```
+
+The installer:
+- detects `/boot/grub` or `/boot/grub2` and runs `update-grub`, `grub-mkconfig` or `grub2-mkconfig`,
+- keeps your original `/etc/default/grub` in `/etc/default/grub.persona.orig` (never overwritten) and a timestamped backup on every change,
+- sets `GRUB_GFXMODE` to your screen resolution if you have not set one,
+- disables `GRUB_TERMINAL=console` / `GRUB_TERMINAL_OUTPUT="console"`, which prevent themes from showing.
+
 ### Method 2: Manual Installation
 
 1. **Choose and copy your theme**
@@ -209,6 +226,7 @@ sudo apt install grub-customizer
    sudo mkdir -p /boot/grub/themes
    sudo cp -r themes/persona5_royal/joker /boot/grub/themes/
 ```
+   On Fedora / openSUSE / RHEL, use `/boot/grub2/themes` instead of `/boot/grub/themes` (also in `GRUB_THEME` below).
 
 2. **Edit GRUB configuration**
 ```bash
@@ -222,9 +240,10 @@ sudo apt install grub-customizer
    GRUB_GFXPAYLOAD_LINUX=keep
 ```
    
-   Comment out this line if present:
+   Comment out these lines if present:
 ```bash
    #GRUB_TERMINAL_OUTPUT="console"
+   #GRUB_TERMINAL=console
 ```
 
 3. **Update GRUB**
@@ -232,10 +251,13 @@ sudo apt install grub-customizer
    # Ubuntu/Debian/Mint
    sudo update-grub
    
-   # Arch/Manjaro/Fedora
+   # Arch/Manjaro
    sudo grub-mkconfig -o /boot/grub/grub.cfg
    
-   # RHEL/CentOS (UEFI)
+   # Fedora/openSUSE/RHEL 9+
+   sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+   
+   # Older RHEL/CentOS (UEFI)
    sudo grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
 ```
 
@@ -291,21 +313,39 @@ sudo apt install grub-customizer
 
 </details>
 
-### Persona 5: The Phantom X (42+ themes)
+### Persona 5: The Phantom X (42 themes)
 <details>
 <summary>Click to expand character list</summary>
 
-**Main Characters:**
-- Wonder (Multiple variants: Default, Valentine, Beach, CNY)
-- Cattle
-- Mont
-- Closer (Motoha)
-- Bui
-- Rin
-- Messa
-- Yuki
-
-**And many more variants including seasonal and special editions!**
+- **Wonder** - Default, Beach, Chinese New Year, Valentine
+- **Ange**
+- **Berry**
+- **Bui** - Default, Stellar
+- **Cattle**
+- **Cherish**
+- **Chord**
+- **Closer** - Default, Beach
+- **Fleuret**
+- **Howler**
+- **Key**
+- **Leon**
+- **Luce** - Default, Notte
+- **Marian** - Default, Beach
+- **Matoi**
+- **Messa**
+- **Moko** - Default, Beach
+- **Mont** - Default, Music
+- **Okyann**
+- **Phoebe**
+- **Puppet** - Default, Beach
+- **Riddle**
+- **Rin** - Default, Chinese New Year
+- **Sepia**
+- **Soy** - Default, Frontiere
+- **Turbo**
+- **Vino**
+- **Wind** - Default, Vast
+- **Yuki**
 
 </details>
 
@@ -371,6 +411,12 @@ You can customize any of these files to your liking.
 
 ## 🗑️ Uninstallation
 
+### With the installer
+```bash
+sudo python3 install.py --uninstall   # remove the Persona themes and the GRUB_THEME line
+sudo python3 install.py --restore     # or: put back your original /etc/default/grub
+```
+
 ### Remove Specific Theme
 ```bash
 sudo rm -rf /boot/grub/themes/[theme-name]
@@ -387,7 +433,9 @@ sudo nano /etc/default/grub
 # Update GRUB
 sudo update-grub  # Ubuntu/Debian
 # OR
-sudo grub-mkconfig -o /boot/grub/grub.cfg  # Arch/Fedora
+sudo grub-mkconfig -o /boot/grub/grub.cfg  # Arch
+# OR
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg  # Fedora/openSUSE
 
 # Reboot
 sudo reboot
@@ -504,6 +552,7 @@ Contributions are warmly welcomed! Here's how you can help:
 
 - **Official All-Out Attacks only**: a character is added only if an official All-Out Attack finisher image exists for them (see the [Roadmap](./ROADMAP.md#-golden-rule-official-all-out-attacks-only))
 - Follow existing theme structure
+- Check readability with `python3 tools/check_contrast.py` (needs Pillow; `--fix` adjusts the text colours)
 - Test themes before submitting
 - Provide preview images
 - Use high-quality assets
@@ -520,8 +569,8 @@ Contributions are warmly welcomed! Here's how you can help:
 
 Need help? Have questions?
 
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/HamzaKarrouchi/Persona_GRUB_Themes/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/HamzaKarrouchi/Persona_GRUB_Themes/discussions)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/CodeByHaamza/Persona_GRUB_Themes/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/CodeByHaamza/Persona_GRUB_Themes/discussions)
 - 📧 **Email**: [hamza.karrouchi.dev@gmail.com](mailto:hamza.karrouchi.dev@gmail.com)
 - ⭐ **Star the repo** if you find it useful!
 
@@ -537,12 +586,12 @@ If you enjoy this project, please consider:
 
 ## 📊 Project Stats
 
-![GitHub stars](https://img.shields.io/github/stars/HamzaKarrouchi/Persona_GRUB_Themes?style=social)
-![GitHub forks](https://img.shields.io/github/forks/HamzaKarrouchi/Persona_GRUB_Themes?style=social)
-![GitHub issues](https://img.shields.io/github/issues/HamzaKarrouchi/Persona_GRUB_Themes)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/HamzaKarrouchi/Persona_GRUB_Themes)
-![GitHub last commit](https://img.shields.io/github/last-commit/HamzaKarrouchi/Persona_GRUB_Themes)
-![GitHub repo size](https://img.shields.io/github/repo-size/HamzaKarrouchi/Persona_GRUB_Themes)
+![GitHub stars](https://img.shields.io/github/stars/CodeByHaamza/Persona_GRUB_Themes?style=social)
+![GitHub forks](https://img.shields.io/github/forks/CodeByHaamza/Persona_GRUB_Themes?style=social)
+![GitHub issues](https://img.shields.io/github/issues/CodeByHaamza/Persona_GRUB_Themes)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/CodeByHaamza/Persona_GRUB_Themes)
+![GitHub last commit](https://img.shields.io/github/last-commit/CodeByHaamza/Persona_GRUB_Themes)
+![GitHub repo size](https://img.shields.io/github/repo-size/CodeByHaamza/Persona_GRUB_Themes)
 
 ---
 
@@ -552,7 +601,7 @@ If you enjoy this project, please consider:
 
 *"I am thou, thou art I... Thou hast acquired a new bootloader theme!"*
 
-[![GitHub Profile](https://img.shields.io/badge/GitHub-HamzaKarrouchi-181717?style=for-the-badge&logo=github)](https://github.com/HamzaKarrouchi)
+[![GitHub Profile](https://img.shields.io/badge/GitHub-CodeByHaamza-181717?style=for-the-badge&logo=github)](https://github.com/CodeByHaamza)
 [![Email](https://img.shields.io/badge/Email-Contact_Me-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:hamza.karrouchi.dev@gmail.com)
 
 [⬆ Back to top](#-persona-grub-themes-collection)

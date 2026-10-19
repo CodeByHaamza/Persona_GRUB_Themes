@@ -20,6 +20,8 @@ Items are grouped by area and ordered by priority inside each section. Check a b
 - [9. Distribution & Visibility](#9-distribution--visibility)
 - [10. Full Persona Boot Experience](#10-full-persona-boot-experience)
 - [11. Legal](#11-legal)
+- [Done So Far](#-done-so-far)
+- [To Do Later (needs Hamza)](#-to-do-later-needs-hamza)
 - [Suggested Order](#-suggested-order)
 
 ---
@@ -192,15 +194,15 @@ Until the build pipeline ([6](#6-repository-structure--build-pipeline)) exists: 
 ## 4. Theme Design
 
 ### 4.1 Readability
-- [ ] Fix `fuuka` text colour.
+- [x] Fix `fuuka` text colour (and every theme with black text on the dark menu panel).
 - [ ] Add a **semi-transparent dark panel** behind the menu (`menu_pixmap_style` with ~60–70 % opacity), so text stays readable on any background.
 - [ ] Make the **menu position configurable per theme** (left or right, depending on where the character is), so it never covers the character or the text printed in the artwork.
-- [ ] Automatic contrast check in CI (see [7.1](#71-theme-validation)).
+- [x] Contrast checker: `tools/check_contrast.py` (`--fix` corrects `theme.txt`). Still to wire into CI (see [7.1](#71-theme-validation)).
 
 ### 4.2 Per-character colours
 - [ ] Use each character's own colour for the selection bar, progress bar and icons (green icons for Oracle, teal for Fuuka…), instead of one colour per game.
-- [ ] Fix the swapped progress bar colours (red on P3R, blue on P5X).
-- [ ] Fix the `junpei` icon set.
+- [x] Fix the swapped progress bar colours (red on P3R, blue on P5X): they now use each character's selection colour.
+- [x] Fix the `junpei` icon set.
 
 **How to integrate:** colours come from `characters.yaml`. `build.py` recolours the icons and selection pixmaps from the shared greyscale masks (the existing `change_colors.py` logic).
 
@@ -227,18 +229,19 @@ Until the build pipeline ([6](#6-repository-structure--build-pipeline)) exists: 
 ## 5. Installer
 
 ### 5.1 Distro support (bug fixes first)
-- [ ] Detect the GRUB directory: `/boot/grub` or `/boot/grub2`.
-- [ ] Detect the update command: `update-grub`, `grub-mkconfig` or `grub2-mkconfig`, with the right output path (`/boot/grub2/grub.cfg` on Fedora / openSUSE).
-- [ ] Comment out `GRUB_TERMINAL=console` as well as `GRUB_TERMINAL_OUTPUT`.
+- [x] Detect the GRUB directory: `/boot/grub` or `/boot/grub2`.
+- [x] Detect the update command: `update-grub`, `grub-mkconfig` or `grub2-mkconfig`, with the right output path (`/boot/grub2/grub.cfg` on Fedora / openSUSE).
+- [x] Comment out `GRUB_TERMINAL=console` as well as `GRUB_TERMINAL_OUTPUT`.
 
 ### 5.2 Safe config handling
-- [ ] **Timestamped backups** (`/etc/default/grub.bak.2026-10-19_14-03-11`) and never overwrite the first original backup.
-- [ ] `--restore`: put back the original `/etc/default/grub` and regenerate GRUB.
-- [ ] `--uninstall`: remove the installed theme(s) and the `GRUB_THEME` line.
-- [ ] `--dry-run`: print what would change without touching anything.
+- [x] **Timestamped backups** (`/etc/default/grub.bak.2026-10-19_14-03-11`) and never overwrite the first original backup.
+- [x] `--restore`: put back the original `/etc/default/grub` and regenerate GRUB.
+- [x] `--uninstall`: remove the installed theme(s) and the `GRUB_THEME` line.
+- [x] `--dry-run`: print what would change without touching anything.
 
 ### 5.3 Resolution detection
-- [ ] Read the screen resolution (`/sys/class/drm/*/modes`, `xrandr` or `wlr-randr` as fallbacks), set `GRUB_GFXMODE=<res>,auto` and `GRUB_GFXPAYLOAD_LINUX=keep`, and install the matching background size (see [2.4](#24-multiple-resolutions-and-aspect-ratios)).
+- [x] Read the screen resolution (`/sys/class/drm/*/modes`) and set `GRUB_GFXMODE=<res>,auto` when the user has not set one.
+- [ ] Install the matching background size (see [2.4](#24-multiple-resolutions-and-aspect-ratios)).
 
 ### 5.4 Dual-boot
 - [ ] Offer to enable `os-prober` (`GRUB_DISABLE_OS_PROBER=false`). Many dual-boot users do not see Windows in the menu.
@@ -246,7 +249,8 @@ Until the build pipeline ([6](#6-repository-structure--build-pipeline)) exists: 
 ### 5.5 Better interface
 - [ ] Arrow-key TUI with search by name (`curses`, or `rich` / `textual`).
 - [ ] **Image preview in the terminal** (`chafa`, kitty `icat`, sixel) before installing.
-- [ ] Non-interactive CLI:
+- [x] Non-interactive CLI (`--theme`, `--list`, `--uninstall`, `--restore`, `--dry-run`, `-y`). Still to add: `--game`, `--random`.
+- Planned CLI:
   ```bash
   sudo python3 install.py --game p5r --char joker
   sudo python3 install.py --list
@@ -349,10 +353,10 @@ Persona_GRUB_Themes/
 ## 8. README & Documentation
 
 ### 8.1 Fixes
-- [ ] Update every link to `CodeByHaamza/Persona_GRUB_Themes`.
-- [ ] Correct the theme count (and generate it automatically).
-- [ ] Remove Pillow from the dependencies (unless the installer starts using it).
-- [ ] Remove "High-Quality Assets" until 2.x is done.
+- [x] Update every link to `CodeByHaamza/Persona_GRUB_Themes`.
+- [x] Correct the theme count. Still to generate it automatically (see [6](#6-repository-structure--build-pipeline)).
+- [x] Remove Pillow from the dependencies (unless the installer starts using it).
+- [x] Remove "High-Quality Assets" until 2.x is done.
 
 ### 8.2 Full gallery
 - [ ] Show **every** theme (generated tables, collapsible per game), not only 6 per game.
@@ -362,12 +366,13 @@ Persona_GRUB_Themes/
 - [ ] README in **Chinese** and **Japanese** (P5X is huge in Asia), plus **French**.
 
 ### 8.4 Issue templates
-- [ ] `.github/ISSUE_TEMPLATE/character_request.yml` with a **required** "Official All-Out Attack image link" field.
-- [ ] `bug_report.yml` asking for distro, GRUB version, BIOS / UEFI, resolution.
+- [x] `.github/ISSUE_TEMPLATE/character_request.yml` with a **required** "Official All-Out Attack image link" field.
+- [x] `bug_report.yml` asking for distro, GRUB version, BIOS / UEFI, resolution.
 - [ ] GitHub Discussions with a poll for the next characters (among those with an official AOA).
 
 ### 8.5 Contributing
-- [ ] Add the Golden Rule and the "How to add a character" process ([3.5](#35-how-to-add-a-character-process)) to the README / a `CONTRIBUTING.md`.
+- [x] Golden Rule in the README Contributing guidelines.
+- [ ] Add the "How to add a character" process ([3.5](#35-how-to-add-a-character-process)) to the README / a `CONTRIBUTING.md`.
 
 ---
 
@@ -402,6 +407,48 @@ Matching themes for every step of the boot, built from the same official AOA ima
 - [ ] **Never remove copyright lines** from official images.
 - [ ] Credit every rip / source in `SOURCES.md`.
 - [ ] Stay non-commercial.
+
+---
+
+## ✔️ Done So Far
+
+| Area | What was done |
+|---|---|
+| Readability | `tools/check_contrast.py` measures menu / selected / progress bar text contrast for every theme and fixes `theme.txt` with `--fix`. 17 themes had black text on the dark menu panel, 25 had light text on light selection bars: all fixed. Fox and Noir got a darker menu panel. All 68 themes pass. |
+| Progress bar | P3R and P5X progress bars now use each character's colour instead of one colour for the whole game. |
+| Icons | `junpei` now uses the P3R icon set. |
+| Installer | `/boot/grub` vs `/boot/grub2`, `update-grub` / `grub-mkconfig` / `grub2-mkconfig`, original config kept once + timestamped backups, `GRUB_TERMINAL=console` handled, `GRUB_GFXMODE` from the detected resolution, `--theme`, `--list`, `--uninstall`, `--restore`, `--dry-run`, `-y`. |
+| README | Links, theme count, dependencies, full P5X list, installer options, Fedora / openSUSE commands, AOA rule. |
+| Issues | Character request template (official AOA link required), bug report template. |
+
+---
+
+## 🧑‍🎨 To Do Later (needs Hamza)
+
+These items need files or actions that are not in the repository. Each one should land as its own PR.
+
+### Needs the private scripts
+- [ ] **Publish the dev scripts**: move `change_colors.py`, `generate_theme_txt.sh` and `prev.py` into `tools/`, remove them from `.gitignore`. Everything in [6](#6-repository-structure--build-pipeline) builds on them.
+- [ ] **Regenerate the previews**: the readability and progress bar fixes changed the colours of 61 themes, so `previews/` no longer matches the themes exactly. Re-run `prev.py` on every theme.
+- [ ] **Build pipeline**: turn the scripts into `tools/build.py` + `characters.yaml` (see [6.2](#62-charactersyaml-single-source-of-truth)).
+
+### Needs the images (official All-Out Attacks only)
+- [ ] **Re-source the 13 stretched themes** ([1.2](#12-wrong-aspect-ratio--stretched-characters)) with 16:9 versions of the same AOA.
+- [ ] **Re-source the low-res backgrounds** ([1.1](#11-backgrounds-below-19201080)): P5X from the Global game files, P3R `shinji` / `kotone` / `fuuka`, P5R `black_mask` / `caroline_justine` / `lavenza`.
+- [ ] **New P5X characters and outfits** released since the last update, each with its official AOA ([3.1](#31-persona-5-the-phantom-x)).
+- [ ] **Persona 4 Revival** on release, from its official AOAs ([3.4](#34-persona-4-revival-)).
+- [ ] Fill `SOURCES.md` with the source of every AOA image.
+
+### Needs a decision
+- [ ] Rewrite the git history to shrink the 215 MB `.git`, or start a clean `v2` (see [6.3](#63-steps)).
+- [ ] Repository settings: topics, social preview image, enable Discussions.
+- [ ] Packages (AUR, COPR, Nix) and posts (Reddit, Pling): they should wait for the new images.
+
+### Can be done without Hamza (next PRs)
+- [ ] CI workflow running `tools/check_contrast.py` and checking that every theme folder is complete.
+- [ ] Scrollbar pixmaps for each game ([4.3](#43-game-styled-ui)).
+- [ ] Installer: os-prober prompt ([5.4](#54-dual-boot)), `--random`, TUI.
+- [ ] Translations of the README ([8.3](#83-translations)).
 
 ---
 

@@ -1,0 +1,42 @@
+name: 🎭 Character request
+description: Ask for a new character or outfit theme
+title: "[Character] "
+labels: ["character request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Themes are only made from **official All-Out Attack finisher images**.
+        Requests without a link to the official All-Out Attack image of this character (or outfit) will be closed.
+  - type: dropdown
+    id: game
+    attributes:
+      label: Game
+      options:
+        - Persona 5: The Phantom X
+        - Persona 5 Royal
+        - Persona 3 Reload
+        - Persona 4 Revival
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: character
+    attributes:
+      label: Character and outfit
+      placeholder: "e.g. Wonder (Summer outfit)"
+    validations:
+      required: true
+  - type: input
+    id: aoa
+    attributes:
+      label: Official All-Out Attack image link
+      description: Link to the official All-Out Attack finisher image (game rip, official site, official account...). The higher the resolution, the better.
+      placeholder: https://
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Resolution of the image, other sources, anything useful.

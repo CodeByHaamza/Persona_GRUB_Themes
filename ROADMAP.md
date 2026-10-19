@@ -234,6 +234,8 @@ Until the build pipeline ([6](#6-repository-structure--build-pipeline)) exists: 
 - [x] Fix `fuuka` text colour (and every theme with black text on the dark menu panel).
 - [ ] Add a **semi-transparent dark panel** behind the menu (`menu_pixmap_style` with ~60–70 % opacity), so text stays readable on any background.
 - [ ] Make the **menu position configurable per theme** (left or right, depending on where the character is), so it never covers the character or the text printed in the artwork.
+  - **The menu covers the character** (the menu is always on the left, 12–45 % of the width): `aigis_fes`, `yukari`, `mitsuru`, and partly `koromaru`. Move their menu to the right: in `theme.txt`, `left = 55%` for `boot_menu` and `left = 57%` for `progress_bar`. No new files needed, only the previews to regenerate afterwards. Check again with the HD images, in case the character is placed differently.
+  - **The menu covers the text of the All-Out Attack** (not the character): `fuuka`, `lavenza`, `caroline_justine`, `ange`, `rin`, `messa`. Less urgent: decide case by case once the HD images are in.
 - [x] Contrast checker: `tools/check_contrast.py` (`--fix` corrects `theme.txt`). Still to wire into CI (see [7.1](#71-theme-validation)).
 
 ### 4.2 Per-character colours

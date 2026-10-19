@@ -14,7 +14,7 @@
 ### Turn your boot menu into a Persona menu.
 
 **68 GRUB themes** made from the **official All-Out Attack** artwork of<br>
-*Persona 5 Royal* · *Persona 5: The Phantom X* · *Persona 3 Reload*
+*Persona 5 Royal* · *Persona 5: The Phantom X* · *Persona 3 Reload* · <sub>*Persona 4 Revival coming soon*</sub>
 
 <br>
 
@@ -156,6 +156,17 @@ Pick a game, pick a character, reboot. Your original GRUB config is saved, and `
 
 </div>
 <!-- /gallery:persona3_reload -->
+
+<img src=".github/readme/game_p4r.svg" width="100%" alt="Persona 4 Revival: coming soon">
+
+<div align="center">
+
+<img src=".github/readme/p4r_keyart.jpg" width="60%" alt="Persona 4 Revival key art">
+
+**Persona 4 Revival is next.** On release day, the Investigation Team joins the collection with their official All-Out Attacks.<br>
+<sub>⭐ Star or 👀 watch the repo to know when they land.</sub>
+
+</div>
 
 <img src=".github/readme/divider_p3.svg" width="100%" alt="">
 
@@ -425,7 +436,7 @@ Still stuck? [Open an issue](https://github.com/CodeByHaamza/Persona_GRUB_Themes
 
 - 🖼️ **High-quality All-Out Attacks** extracted from the games, for every theme
 - 🎭 **New Phantom X characters and outfits** as they are released
-- 📺 **Persona 4 Revival** on release day
+- 📺 **Persona 4 Revival** on release day: the README header and the installer colours are already in place
 - 🖥️ **HiDPI / 4K** fonts and icons, multi-resolution backgrounds
 - 🎬 Matching **Plymouth**, **SDDM** and **GDM** themes
 

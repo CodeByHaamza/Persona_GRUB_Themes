@@ -208,13 +208,14 @@ The Starlight outfits come from P5X, so they go in `persona5_phantom_x/`. P5R ke
 - [ ] **Episode Aigis**: check for AOA finishers that differ from the base game.
 
 ### 3.4 Persona 4 Revival 🔜
-- [ ] **When Persona 4 Revival releases**, add the full cast from their official All-Out Attack finisher images.
-- [ ] Prepare the structure now so the themes can ship on release day:
-  - create `themes/persona4_revival/` (empty, with a `.gitkeep`),
-  - add `"persona4_revival": "Persona 4 Revival"` to the game list,
-  - pick the game's colour palette (yellow / black, TV static) for the shared assets (icons, selection pixmaps, progress bar).
-
 Being first with P4 Revival themes on release day is the biggest visibility opportunity for the repo.
+
+- [ ] **When Persona 4 Revival releases**, add the full cast from their official All-Out Attack finisher images.
+- [ ] Theme assets in the P4 palette (yellow / black, TV static): selection pixmaps, progress bar, icons.
+- [x] README: "coming soon" section with an animated P4 header (`game_p4r.svg`, yellow and black with TV static) and the official key art.
+- [x] Installer: the P4 Revival colours are ready in `install_ui.py` (`GAME_STYLES["persona4_revival"]`) and its name in `install.py` (`GAME_NAMES`). The game appears as soon as `themes/persona4_revival/` has themes. Set `hero` to the protagonist's folder name.
+- [ ] Do **not** create an empty `themes/persona4_revival/` folder before release: the installer would show a game with no themes.
+- [ ] On release: extract the AOAs, add the themes, add a `<!-- gallery:persona4_revival -->` block and the game to `GAMES` in `tools/readme_assets.py`, replace the "coming soon" section with the gallery.
 
 ### 3.5 How to add a character (process)
 1. Find the **official AOA image** and its source link.

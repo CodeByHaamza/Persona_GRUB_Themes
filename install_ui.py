@@ -43,6 +43,9 @@ GAME_STYLES = {
                            "tagline": "GO BEYOND", "hero": "wonder"},
     "persona3_reload": {"accent": P3_BLUE, "bg": P3_NAVY, "title": "PERSONA 3 RELOAD", "tagline": "MEMENTO MORI",
                         "hero": "makoto"},
+    # Prêt pour la sortie de Persona 4 Revival : affiché dès que themes/persona4_revival/ a des thèmes
+    "persona4_revival": {"accent": (255, 212, 0), "bg": (20, 18, 6), "title": "PERSONA 4 REVIVAL",
+                         "tagline": "REACH OUT TO THE TRUTH", "hero": "yu"},
 }
 
 # (fond, lettre) des lettres découpées : sur fond noir, et sur la bande rouge des en-têtes P5

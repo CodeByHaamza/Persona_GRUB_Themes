@@ -239,7 +239,8 @@ DRY_RUN = False
 GAME_NAMES = {
     "persona5_royal": "Persona 5 Royal",
     "persona5_phantom_x": "Persona 5: The Phantom X",
-    "persona3_reload": "Persona 3 Reload"
+    "persona3_reload": "Persona 3 Reload",
+    "persona4_revival": "Persona 4 Revival"
 }
 
 def clear_screen():

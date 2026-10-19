@@ -3,6 +3,7 @@
 Génère les visuels du README dans .github/readme/ :
   - banner.svg, quotes.svg, calling_card.svg      (SVG animés)
   - game_p5r.svg, game_p5x.svg, game_p3r.svg      (bandeaux par jeu)
+  - game_p4r.svg                                  (Persona 4 Revival : bientôt)
   - divider_p5.svg, divider_p3.svg                (séparateurs animés)
   - showcase.gif                                  (diaporama des previews)
   - thumbs/<jeu>/<theme>.jpg                      (miniatures de la galerie)
@@ -50,6 +51,7 @@ WHITE = "#FFFFFF"
 P3_BLUE = "#1E6BFF"
 P3_NAVY = "#06102B"
 P3_CYAN = "#7FE3FF"
+P4_YELLOW = "#FFD400"
 
 FONT_FILES = {
     "inter_black": "/usr/share/fonts/opentype/inter/Inter-Black.otf",
@@ -393,6 +395,47 @@ def game_p3r():
     return svg(w, h, body, P3_STYLE, defs)
 
 
+P4_STYLE = """
+.static rect{animation:static .9s steps(3) infinite}
+@keyframes static{0%{opacity:.9}33%{opacity:.15}66%{opacity:.6}100%{opacity:.9}}
+.blink{animation:blink 1.2s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.scan{animation:scan 3s linear infinite}
+@keyframes scan{0%{transform:translateY(-20px)}100%{transform:translateY(200px)}}
+"""
+
+
+def game_p4r():
+    """Persona 4 Revival : jaune et noir, neige de télé, « coming soon »"""
+    w, h = 1280, 180
+    rng = random.Random(4)
+    noise = "".join(
+        f'<rect x="{rng.randrange(0, w)}" y="{rng.randrange(0, h)}" width="{rng.choice((2, 3, 4, 6))}" height="2" '
+        f'fill="{rng.choice(("#FFFFFF", "#BBBBBB", "#555555"))}" style="animation-delay:-{rng.random():.2f}s"/>'
+        for _ in range(420)
+    )
+    stripes = "".join(
+        f'<polygon points="{x},{h} {x + 40},{h - 40} {x + 70},{h - 40} {x + 30},{h}" fill="{P4_YELLOW}"/>'
+        for x in range(-40, w + 40, 60)
+    )
+    title_font = FONTS["inter_black_italic"]
+    body = f"""
+<rect width="{w}" height="{h}" fill="#141414"/>
+<g class="static" opacity=".35">{noise}</g>
+<rect class="scan" x="0" y="0" width="{w}" height="6" fill="#FFFFFF" opacity=".08"/>
+<polygon points="0,0 {w * 0.62:.0f},0 {w * 0.58:.0f},{h - 40} 0,{h - 40}" fill="{P4_YELLOW}"/>
+<g class="rise">
+  <path d="{FONTS["inter_bold"].path("PERSONA 4", 18, 72, 50, 6)}" fill="{BLACK}"/>
+  <path d="{title_font.path("REVIVAL", 66, 68, 118, 4)}" fill="{BLACK}"/>
+</g>
+{stripes}
+<g class="blink"><rect x="900" y="60" width="16" height="16" fill="#FF2A2A"/></g>
+<path d="{FONTS["inter_black"].path("COMING SOON", 26, 930, 78, 3)}" fill="{P4_YELLOW}"/>
+<path d="{FONTS["inter_semibold"].path("official All-Out Attacks on release day", 14, 930, 104, 1)}" fill="#BBBBBB"/>
+"""
+    return svg(w, h, body, P4_STYLE + P3_STYLE)
+
+
 # --- SÉPARATEURS ---
 def divider_p5():
     w, h = 1280, 22
@@ -661,6 +704,7 @@ def main():
         "game_p5r.svg": game_p5r(),
         "game_p5x.svg": game_p5x(),
         "game_p3r.svg": game_p3r(),
+        "game_p4r.svg": game_p4r(),
         "divider_p5.svg": divider_p5(),
         "divider_p3.svg": divider_p3(),
         "calling_card.svg": calling_card(),

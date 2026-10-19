@@ -6,7 +6,8 @@ Génère les visuels du README dans .github/readme/ :
   - divider_p5.svg, divider_p3.svg                (séparateurs animés)
   - showcase.gif                                  (diaporama des previews)
   - thumbs/<jeu>/<theme>.jpg                      (miniatures de la galerie)
-et met à jour la galerie du README (entre les balises <!-- gallery:<jeu> -->).
+et met à jour la galerie du README (entre les balises <!-- gallery:<jeu> -->)
+ainsi que le badge de progression HD (<!-- hd-progress -->).
 
 Le texte des SVG est converti en tracés : le rendu est identique partout,
 même sans les polices installées.
@@ -567,6 +568,13 @@ COLUMNS = 3
 NAMES = {"aigis_fes": "Aigis (FES)"}
 
 
+def is_hd(game, theme):
+    """Fond d'au moins 1920x1080 et en 16:9 (à 1 % près) : sinon, l'image est à ré-extraire"""
+    with Image.open(os.path.join(THEMES_DIR, game, theme, "background.png")) as bg:
+        w, h = bg.size
+    return w >= 1920 and h >= 1080 and abs(w / h - 16 / 9) / (16 / 9) < 0.01
+
+
 def gallery_rows(game, themes):
     import install  # noms d'affichage des variantes (wonder_cny -> Wonder (Chinese New Year))
     cells = []
@@ -575,7 +583,7 @@ def gallery_rows(game, themes):
         cells.append(
             f'<td align="center"><a href="previews/{game}/{theme}.png">'
             f'<img src=".github/readme/thumbs/{game}/{theme}.jpg" width="260" alt="{name}"></a>'
-            f"<br><b>{name}</b></td>"
+            f"<br><b>{name}</b><br><sub>{'✅ HD' if is_hd(game, theme) else '⏳ HD soon'}</sub></td>"
         )
     rows = ["<tr>" + "".join(cells[i:i + COLUMNS]) + "</tr>" for i in range(0, len(cells), COLUMNS)]
     return "<table>\n" + "\n".join(rows) + "\n</table>"
@@ -594,10 +602,19 @@ def gallery(game):
     return html + "\n</div>"
 
 
+def hd_badge():
+    themes = [p.split(os.sep)[-3:-1] for p in glob.glob(os.path.join(THEMES_DIR, "*", "*", "theme.txt"))]
+    hd = sum(is_hd(game, theme) for game, theme in themes)
+    color = "2EA043" if hd == len(themes) else "E60012"
+    return (f"[![HD artwork](https://img.shields.io/badge/HD_artwork-{hd}%2F{len(themes)}-{color}"
+            f"?style=for-the-badge&labelColor=0D0D0D)](#-the-gallery)")
+
+
 def update_readme():
     sys.path.insert(0, ROOT)
     with open(README) as f:
         text = f.read()
+    text = re.sub(r"(<!-- hd-progress -->).*?(<!-- /hd-progress -->)", lambda m: m.group(1) + hd_badge() + m.group(2), text)
     for game in GAMES:
         pattern = re.compile(rf"(<!-- gallery:{game} -->).*?(<!-- /gallery:{game} -->)", re.S)
         text = pattern.sub(lambda m: m.group(1) + "\n" + gallery(game) + "\n" + m.group(2), text)

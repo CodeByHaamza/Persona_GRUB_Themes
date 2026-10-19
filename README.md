@@ -61,7 +61,8 @@ Pick a game, pick a character, reboot. Your original GRUB config is saved, and `
 🐧 **Ubuntu, Debian, Arch, Fedora, openSUSE** and more<br>
 ↩️ **Safe**: original config kept, `--restore` / `--uninstall`<br>
 🖥️ **Resolution detected** automatically<br>
-🦋 **Velvet Room** entry and 💿 **Ventoy** support
+🦋 **Velvet Room** entry and 💿 **Ventoy** support<br>
+🌐 **6 languages**, 🃏 **Shuffle Time** and a few secrets
 
 </td>
 </tr>
@@ -79,8 +80,8 @@ Pick a game, pick a character, reboot. Your original GRUB config is saved, and `
 <div align="center">
 
 <table>
-<tr><td align="center"><a href="previews/persona5_royal/joker.png"><img src=".github/readme/thumbs/persona5_royal/joker.jpg" width="260" alt="Joker" title="“THE SHOW&#x27;S OVER”"></a><br><b>Joker</b><br><sub>✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/skull.png"><img src=".github/readme/thumbs/persona5_royal/skull.jpg" width="260" alt="Skull" title="“FREAKIN&#x27; BORING!”"></a><br><b>Skull</b><br><sub>✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/panther.png"><img src=".github/readme/thumbs/persona5_royal/panther.jpg" width="260" alt="Panther" title="“OMG!! We are SO awesome”"></a><br><b>Panther</b><br><sub>✅ HD</sub></td></tr>
-<tr><td align="center"><a href="previews/persona5_royal/morgana.png"><img src=".github/readme/thumbs/persona5_royal/morgana.jpg" width="260" alt="Morgana" title="“MISSION ACCOMPLISHED”"></a><br><b>Morgana</b><br><sub>✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/fox.png"><img src=".github/readme/thumbs/persona5_royal/fox.jpg" width="260" alt="Fox" title="“IT WAS FUN WHILE IT LASTED. GOODBYE”"></a><br><b>Fox</b><br><sub>✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/queen.png"><img src=".github/readme/thumbs/persona5_royal/queen.jpg" width="260" alt="Queen" title="“JUSTICE HAS PREVAILED.”"></a><br><b>Queen</b><br><sub>✅ HD</sub></td></tr>
+<tr><td align="center"><a href="previews/persona5_royal/joker.png"><img src=".github/readme/thumbs/persona5_royal/joker.jpg" width="260" alt="Joker" title="“THE SHOW&#x27;S OVER”"></a><br><b>Joker</b><br><sub>🃏 Fool · ✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/skull.png"><img src=".github/readme/thumbs/persona5_royal/skull.jpg" width="260" alt="Skull" title="“FREAKIN&#x27; BORING!”"></a><br><b>Skull</b><br><sub>🃏 Chariot · ✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/panther.png"><img src=".github/readme/thumbs/persona5_royal/panther.jpg" width="260" alt="Panther" title="“OMG!! We are SO awesome”"></a><br><b>Panther</b><br><sub>🃏 Lovers · ✅ HD</sub></td></tr>
+<tr><td align="center"><a href="previews/persona5_royal/morgana.png"><img src=".github/readme/thumbs/persona5_royal/morgana.jpg" width="260" alt="Morgana" title="“MISSION ACCOMPLISHED”"></a><br><b>Morgana</b><br><sub>🃏 Magician · ✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/fox.png"><img src=".github/readme/thumbs/persona5_royal/fox.jpg" width="260" alt="Fox" title="“IT WAS FUN WHILE IT LASTED. GOODBYE”"></a><br><b>Fox</b><br><sub>🃏 Emperor · ✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/queen.png"><img src=".github/readme/thumbs/persona5_royal/queen.jpg" width="260" alt="Queen" title="“JUSTICE HAS PREVAILED.”"></a><br><b>Queen</b><br><sub>🃏 Priestess · ✅ HD</sub></td></tr>
 </table>
 
 <details>
@@ -88,9 +89,9 @@ Pick a game, pick a character, reboot. Your original GRUB config is saved, and `
 <br>
 
 <table>
-<tr><td align="center"><a href="previews/persona5_royal/oracle.png"><img src=".github/readme/thumbs/persona5_royal/oracle.jpg" width="260" alt="Oracle" title="“Git Gud”"></a><br><b>Oracle</b><br><sub>✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/noir.png"><img src=".github/readme/thumbs/persona5_royal/noir.jpg" width="260" alt="Noir" title="“Adieu.”"></a><br><b>Noir</b><br><sub>✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/crow.png"><img src=".github/readme/thumbs/persona5_royal/crow.jpg" width="260" alt="Crow" title="“My sole interest is uncovering the truth.”"></a><br><b>Crow</b><br><sub>✅ HD</sub></td></tr>
-<tr><td align="center"><a href="previews/persona5_royal/violet.png"><img src=".github/readme/thumbs/persona5_royal/violet.jpg" width="260" alt="Violet" title="“Beauty is Devotion”"></a><br><b>Violet</b><br><sub>✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/black_mask.png"><img src=".github/readme/thumbs/persona5_royal/black_mask.jpg" width="260" alt="Black Mask" title="“I DECIDE THE TRUTH”"></a><br><b>Black Mask</b><br><sub>⏳ HD soon</sub></td><td align="center"><a href="previews/persona5_royal/caroline_justine.png"><img src=".github/readme/thumbs/persona5_royal/caroline_justine.jpg" width="260" alt="Caroline & Justine" title="“Don&#x27;t be so cocky”"></a><br><b>Caroline & Justine</b><br><sub>⏳ HD soon</sub></td></tr>
-<tr><td align="center"><a href="previews/persona5_royal/lavenza.png"><img src=".github/readme/thumbs/persona5_royal/lavenza.jpg" width="260" alt="Lavenza" title="“Don&#x27;t be naïve”"></a><br><b>Lavenza</b><br><sub>⏳ HD soon</sub></td></tr>
+<tr><td align="center"><a href="previews/persona5_royal/oracle.png"><img src=".github/readme/thumbs/persona5_royal/oracle.jpg" width="260" alt="Oracle" title="“Git Gud”"></a><br><b>Oracle</b><br><sub>🃏 Hermit · ✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/noir.png"><img src=".github/readme/thumbs/persona5_royal/noir.jpg" width="260" alt="Noir" title="“Adieu.”"></a><br><b>Noir</b><br><sub>🃏 Empress · ✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/crow.png"><img src=".github/readme/thumbs/persona5_royal/crow.jpg" width="260" alt="Crow" title="“My sole interest is uncovering the truth.”"></a><br><b>Crow</b><br><sub>🃏 Justice · ✅ HD</sub></td></tr>
+<tr><td align="center"><a href="previews/persona5_royal/violet.png"><img src=".github/readme/thumbs/persona5_royal/violet.jpg" width="260" alt="Violet" title="“Beauty is Devotion”"></a><br><b>Violet</b><br><sub>🃏 Faith · ✅ HD</sub></td><td align="center"><a href="previews/persona5_royal/black_mask.png"><img src=".github/readme/thumbs/persona5_royal/black_mask.jpg" width="260" alt="Black Mask" title="“I DECIDE THE TRUTH”"></a><br><b>Black Mask</b><br><sub>🃏 Justice · ⏳ HD soon</sub></td><td align="center"><a href="previews/persona5_royal/caroline_justine.png"><img src=".github/readme/thumbs/persona5_royal/caroline_justine.jpg" width="260" alt="Caroline & Justine" title="“Don&#x27;t be so cocky”"></a><br><b>Caroline & Justine</b><br><sub>🃏 Strength · ⏳ HD soon</sub></td></tr>
+<tr><td align="center"><a href="previews/persona5_royal/lavenza.png"><img src=".github/readme/thumbs/persona5_royal/lavenza.jpg" width="260" alt="Lavenza" title="“Don&#x27;t be naïve”"></a><br><b>Lavenza</b><br><sub>🃏 Strength · ⏳ HD soon</sub></td></tr>
 </table>
 
 </details>
@@ -138,8 +139,8 @@ Pick a game, pick a character, reboot. Your original GRUB config is saved, and `
 <div align="center">
 
 <table>
-<tr><td align="center"><a href="previews/persona3_reload/makoto.png"><img src=".github/readme/thumbs/persona3_reload/makoto.jpg" width="260" alt="Makoto" title="“DONE AND DUSTED.”"></a><br><b>Makoto</b><br><sub>✅ HD</sub></td><td align="center"><a href="previews/persona3_reload/kotone.png"><img src=".github/readme/thumbs/persona3_reload/kotone.jpg" width="260" alt="Kotone" title="“PERFECTLY ACCOMPLISHED!!”"></a><br><b>Kotone</b><br><sub>⏳ HD soon</sub></td><td align="center"><a href="previews/persona3_reload/yukari.png"><img src=".github/readme/thumbs/persona3_reload/yukari.jpg" width="260" alt="Yukari" title="“THERE YOU HAVE IT”"></a><br><b>Yukari</b><br><sub>✅ HD</sub></td></tr>
-<tr><td align="center"><a href="previews/persona3_reload/junpei.png"><img src=".github/readme/thumbs/persona3_reload/junpei.jpg" width="260" alt="Junpei" title="“THAT&#x27;S THE GAME!”"></a><br><b>Junpei</b><br><sub>✅ HD</sub></td><td align="center"><a href="previews/persona3_reload/akihiko.png"><img src=".github/readme/thumbs/persona3_reload/akihiko.jpg" width="260" alt="Akihiko" title="“ON TO THE NEXT BOUT.”"></a><br><b>Akihiko</b><br><sub>✅ HD</sub></td><td align="center"><a href="previews/persona3_reload/mitsuru.png"><img src=".github/readme/thumbs/persona3_reload/mitsuru.jpg" width="260" alt="Mitsuru" title="“KNEEL BEFORE ME.”"></a><br><b>Mitsuru</b><br><sub>✅ HD</sub></td></tr>
+<tr><td align="center"><a href="previews/persona3_reload/makoto.png"><img src=".github/readme/thumbs/persona3_reload/makoto.jpg" width="260" alt="Makoto" title="“DONE AND DUSTED.”"></a><br><b>Makoto</b><br><sub>🃏 Fool · ✅ HD</sub></td><td align="center"><a href="previews/persona3_reload/kotone.png"><img src=".github/readme/thumbs/persona3_reload/kotone.jpg" width="260" alt="Kotone" title="“PERFECTLY ACCOMPLISHED!!”"></a><br><b>Kotone</b><br><sub>🃏 Fool · ⏳ HD soon</sub></td><td align="center"><a href="previews/persona3_reload/yukari.png"><img src=".github/readme/thumbs/persona3_reload/yukari.jpg" width="260" alt="Yukari" title="“THERE YOU HAVE IT”"></a><br><b>Yukari</b><br><sub>🃏 Lovers · ✅ HD</sub></td></tr>
+<tr><td align="center"><a href="previews/persona3_reload/junpei.png"><img src=".github/readme/thumbs/persona3_reload/junpei.jpg" width="260" alt="Junpei" title="“THAT&#x27;S THE GAME!”"></a><br><b>Junpei</b><br><sub>🃏 Magician · ✅ HD</sub></td><td align="center"><a href="previews/persona3_reload/akihiko.png"><img src=".github/readme/thumbs/persona3_reload/akihiko.jpg" width="260" alt="Akihiko" title="“ON TO THE NEXT BOUT.”"></a><br><b>Akihiko</b><br><sub>🃏 Star · ✅ HD</sub></td><td align="center"><a href="previews/persona3_reload/mitsuru.png"><img src=".github/readme/thumbs/persona3_reload/mitsuru.jpg" width="260" alt="Mitsuru" title="“KNEEL BEFORE ME.”"></a><br><b>Mitsuru</b><br><sub>🃏 Empress · ✅ HD</sub></td></tr>
 </table>
 
 <details>
@@ -147,8 +148,8 @@ Pick a game, pick a character, reboot. Your original GRUB config is saved, and `
 <br>
 
 <table>
-<tr><td align="center"><a href="previews/persona3_reload/fuuka.png"><img src=".github/readme/thumbs/persona3_reload/fuuka.jpg" width="260" alt="Fuuka" title="“I&#x27;LL BE YOUR SUPPORT.”"></a><br><b>Fuuka</b><br><sub>⏳ HD soon</sub></td><td align="center"><a href="previews/persona3_reload/aigis.png"><img src=".github/readme/thumbs/persona3_reload/aigis.jpg" width="260" alt="Aigis" title="“TARGET NEUTRALIZED.”"></a><br><b>Aigis</b><br><sub>✅ HD</sub></td><td align="center"><a href="previews/persona3_reload/aigis_fes.png"><img src=".github/readme/thumbs/persona3_reload/aigis_fes.jpg" width="260" alt="Aigis (FES)" title="“TARGET NEUTRALIZED.”"></a><br><b>Aigis (FES)</b><br><sub>✅ HD</sub></td></tr>
-<tr><td align="center"><a href="previews/persona3_reload/ken.png"><img src=".github/readme/thumbs/persona3_reload/ken.jpg" width="260" alt="Ken" title="“DON&#x27;T LOOK DOWN ON ME.”"></a><br><b>Ken</b><br><sub>✅ HD</sub></td><td align="center"><a href="previews/persona3_reload/koromaru.png"><img src=".github/readme/thumbs/persona3_reload/koromaru.jpg" width="260" alt="Koromaru" title="“WOOF! WOOF! WOOF!”"></a><br><b>Koromaru</b><br><sub>✅ HD</sub></td><td align="center"><a href="previews/persona3_reload/shinji.png"><img src=".github/readme/thumbs/persona3_reload/shinji.jpg" width="260" alt="Shinji" title="“DON&#x27;T WASTE YOUR BREATH.”"></a><br><b>Shinji</b><br><sub>⏳ HD soon</sub></td></tr>
+<tr><td align="center"><a href="previews/persona3_reload/fuuka.png"><img src=".github/readme/thumbs/persona3_reload/fuuka.jpg" width="260" alt="Fuuka" title="“I&#x27;LL BE YOUR SUPPORT.”"></a><br><b>Fuuka</b><br><sub>🃏 Priestess · ⏳ HD soon</sub></td><td align="center"><a href="previews/persona3_reload/aigis.png"><img src=".github/readme/thumbs/persona3_reload/aigis.jpg" width="260" alt="Aigis" title="“TARGET NEUTRALIZED.”"></a><br><b>Aigis</b><br><sub>🃏 Aeon · ✅ HD</sub></td><td align="center"><a href="previews/persona3_reload/aigis_fes.png"><img src=".github/readme/thumbs/persona3_reload/aigis_fes.jpg" width="260" alt="Aigis (FES)" title="“TARGET NEUTRALIZED.”"></a><br><b>Aigis (FES)</b><br><sub>🃏 Aeon · ✅ HD</sub></td></tr>
+<tr><td align="center"><a href="previews/persona3_reload/ken.png"><img src=".github/readme/thumbs/persona3_reload/ken.jpg" width="260" alt="Ken" title="“DON&#x27;T LOOK DOWN ON ME.”"></a><br><b>Ken</b><br><sub>🃏 Justice · ✅ HD</sub></td><td align="center"><a href="previews/persona3_reload/koromaru.png"><img src=".github/readme/thumbs/persona3_reload/koromaru.jpg" width="260" alt="Koromaru" title="“WOOF! WOOF! WOOF!”"></a><br><b>Koromaru</b><br><sub>🃏 Strength · ✅ HD</sub></td><td align="center"><a href="previews/persona3_reload/shinji.png"><img src=".github/readme/thumbs/persona3_reload/shinji.jpg" width="260" alt="Shinji" title="“DON&#x27;T WASTE YOUR BREATH.”"></a><br><b>Shinji</b><br><sub>🃏 Moon · ⏳ HD soon</sub></td></tr>
 <tr><td align="center"><a href="previews/persona3_reload/metis.png"><img src=".github/readme/thumbs/persona3_reload/metis.jpg" width="260" alt="Metis" title="“ANYTHING FOR HER.”"></a><br><b>Metis</b><br><sub>✅ HD</sub></td></tr>
 </table>
 
@@ -214,6 +215,14 @@ Pick your game, then your character and its outfit with the arrow keys: each the
 
 The menus fall back to simple numbered lists on terminals without colours, with `NO_COLOR`, or with `--plain`.
 
+### 🎴 Installer extras
+
+- 🌐 **6 languages**: English, Français, Deutsch, Español, Italiano, Português. The installer follows your system language. Use `--lang fr`, or press **L** on the game screen.
+- 🃏 **Shuffle Time**: let fate pick your theme. Tarot cards are dealt, shuffled, and one of them flips over. Use `--shuffle-time`, or press **S** on the game screen.
+- ✦ **Arcana**: every Persona 3 and Persona 5 character shows their Arcana (from the [personadle](https://github.com/CodeByHaamza/personadle) database).
+- 🌙 Try running the installer **between midnight and 1 a.m.**…
+- 🤫 A few **secrets** are hidden in the menus. Persona fans will know what to type.
+
 #### Installer options
 
 ```bash
@@ -224,6 +233,8 @@ sudo python3 install.py --uninstall        # remove the Persona themes from GRUB
 sudo python3 install.py --restore          # restore /etc/default/grub as it was before the first install
 sudo python3 install.py --theme joker -y   # no questions (scripts)
 sudo python3 install.py --plain            # simple numbered menus
+sudo python3 install.py --shuffle-time     # a random theme, picked by a tarot card
+sudo python3 install.py --lang fr          # en, fr, de, es, it, pt
 sudo python3 install.py --velvet-room      # add the Velvet Room entry (see below)
 python3 install.py --ventoy /media/usb     # install on a Ventoy USB drive (see below)
 ```

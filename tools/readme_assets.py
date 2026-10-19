@@ -642,6 +642,13 @@ def is_hd(game, theme):
     return w >= 1920 and h >= 1080 and abs(w / h - 16 / 9) / (16 / 9) < 0.01
 
 
+def arcana_label(theme):
+    """Arcane du personnage (base de personadle), quand elle existe"""
+    import install
+    arcana = install.THEME_ARCANA.get(theme)
+    return f"🃏 {arcana} · " if arcana else ""
+
+
 def tooltip(theme):
     """Au survol : la phrase de l'All-Out Attack du thème"""
     import install
@@ -657,7 +664,7 @@ def gallery_rows(game, themes):
         cells.append(
             f'<td align="center"><a href="previews/{game}/{theme}.png">'
             f'<img src=".github/readme/thumbs/{game}/{theme}.jpg" width="260" alt="{name}"{tooltip(theme)}></a>'
-            f"<br><b>{name}</b><br><sub>{'✅ HD' if is_hd(game, theme) else '⏳ HD soon'}</sub></td>"
+            f"<br><b>{name}</b><br><sub>{arcana_label(theme)}{'✅ HD' if is_hd(game, theme) else '⏳ HD soon'}</sub></td>"
         )
     rows = ["<tr>" + "".join(cells[i:i + COLUMNS]) + "</tr>" for i in range(0, len(cells), COLUMNS)]
     return "<table>\n" + "\n".join(rows) + "\n</table>"

@@ -4,9 +4,13 @@ import sys
 import glob
 import shutil
 import json
+import random
 import argparse
 import datetime
 import subprocess
+
+import install_i18n
+from install_i18n import t
 
 try:
     import install_ui  # interface stylée (flèches, aperçus, animations)
@@ -151,6 +155,17 @@ if [ "$grub_platform" = "efi" ]; then
 fi
 EOF
 """
+
+# Arcane de chaque personnage, reprise de la base de personadle (database/characters_clean.js).
+# Pas d'entrée = pas d'Arcane dans personadle (persos de P5X, Metis) : on n'invente rien.
+THEME_ARCANA = {
+    "makoto": "Fool", "kotone": "Fool", "junpei": "Magician", "yukari": "Lovers", "fuuka": "Priestess",
+    "mitsuru": "Empress", "akihiko": "Star", "aigis": "Aeon", "aigis_fes": "Aeon", "ken": "Justice",
+    "koromaru": "Strength", "shinji": "Moon",
+    "joker": "Fool", "morgana": "Magician", "skull": "Chariot", "panther": "Lovers", "fox": "Emperor",
+    "queen": "Priestess", "oracle": "Hermit", "noir": "Empress", "crow": "Justice", "black_mask": "Justice",
+    "violet": "Faith", "caroline_justine": "Strength", "lavenza": "Strength",
+}
 
 # Une réplique par jeu, quand le thème n'a pas de phrase (voir THEME_QUOTES)
 GAME_QUOTES = {
@@ -363,7 +378,7 @@ def select_from_dict(options, prompt_text, default_color=BG_RED, use_char_colors
                 return keys[idx]
         except ValueError:
             pass
-        print("Invalid selection.")
+        print(t("invalid"))
 
 # --- DÉTECTION DE GRUB ---
 def detect_grub():
@@ -664,6 +679,13 @@ def print_quote(theme_path, theme_name, fancy=False):
         game = os.path.basename(os.path.dirname(theme_path))
         print(f"\n  {C_ITALIC}{C_BOLD}{GAME_QUOTES.get(game, 'Enjoy your Persona GRUB Theme!')}{C_RESET}")
 
+def shuffle_pick(data):
+    """Shuffle Time sans l'interface stylée : un thème au hasard"""
+    paths = [path for characters in data.values() for variants in characters.values() for path in variants.values()]
+    path = random.choice(paths)
+    print(f"\n{BG_BLUE} SHUFFLE TIME {C_RESET} {C_BOLD}{get_display_name(os.path.basename(path))}{C_RESET}")
+    return path
+
 def select_theme_by_name(data, name):
     matches = find_theme(data, name)
     if len(matches) != 1:
@@ -673,12 +695,12 @@ def select_theme_by_name(data, name):
     return matches[0]
 
 def ask_reboot():
-    reboot = input(f"\n{C_BOLD}Do you want to reboot now? [y/N]: {C_RESET}")
-    if reboot.lower() in ["y", "yes"]:
-        print("Rebooting...")
+    reboot = input(f"\n{C_BOLD}{t('reboot_question')}{C_RESET}")
+    if install_i18n.is_yes(reboot):
+        print(t("rebooting"))
         subprocess.run(["reboot"])
     else:
-        print("Okay. Don't forget to reboot later!")
+        print(t("reboot_later"))
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Persona GRUB Theme Installer")
@@ -692,6 +714,9 @@ def parse_args():
     parser.add_argument("--ventoy", metavar="MOUNTPOINT",
                         help="install the theme on a Ventoy USB drive instead of the system GRUB")
     parser.add_argument("--plain", action="store_true", help="use the simple numbered menus")
+    parser.add_argument("--lang", choices=install_i18n.available(),
+                        help="language of the installer (default: the system language)")
+    parser.add_argument("--shuffle-time", action="store_true", help="let fate pick a random theme")
     parser.add_argument("--dry-run", action="store_true", help="show what would change without touching anything")
     parser.add_argument("-y", "--yes", action="store_true", help="do not ask for confirmation or reboot")
     return parser.parse_args()
@@ -699,10 +724,10 @@ def parse_args():
 def interactive_select(data):
     """Menus jeu -> personnage -> variante. Retourne (chemin, nom, variante ou None, couleur)"""
     # 1. Sélection du JEU
-    print(f"{C_BOLD}Select your Game:{C_RESET}")
+    print(f"{C_BOLD}{t('select_game')}{C_RESET}")
     sorted_games = {k: data[k] for k in sorted(data.keys())} 
     display_games = {GAME_NAMES.get(k, k): k for k in sorted_games.keys()}
-    selected_game_display = select_from_dict(display_games, "Choose a game", BG_RED)
+    selected_game_display = select_from_dict(display_games, t("prompt_game"), BG_RED)
     selected_game_key = display_games[selected_game_display]
     
     game_default_color = BG_BLUE if "persona3" in selected_game_key else BG_RED
@@ -710,11 +735,11 @@ def interactive_select(data):
     # 2. Sélection du PERSONNAGE
     clear_screen()
     print_header(selected_game_display, game_default_color)
-    print(f"{C_BOLD}Select a Character:{C_RESET}")
+    print(f"{C_BOLD}{t('select_character')}{C_RESET}")
     
     characters = data[selected_game_key]
     characters = {k: characters[k] for k in sorted(characters.keys())}
-    selected_char_key = select_from_dict(characters, "Choose a character", game_default_color, use_char_colors=True)
+    selected_char_key = select_from_dict(characters, t("prompt_character"), game_default_color, use_char_colors=True)
     
     char_key_simple = selected_char_key.split(' ')[0].lower()
     if "caroline" in char_key_simple: char_key_simple = "caroline"
@@ -727,15 +752,17 @@ def interactive_select(data):
         return list(variants.values())[0], selected_char_key, None, char_color
 
     clear_screen()
-    print_header(f"{selected_char_key} Styles", char_color)
-    print(f"{C_BOLD}Select a Style:{C_RESET}")
-    selected_variant_key = select_from_dict(variants, "Choose a style", char_color)
+    print_header(t("styles_of", name=selected_char_key), char_color)
+    print(f"{C_BOLD}{t('select_style')}{C_RESET}")
+    selected_variant_key = select_from_dict(variants, t("prompt_style"), char_color)
     return variants[selected_variant_key], selected_char_key, selected_variant_key, char_color
 
 def main():
     global DRY_RUN
     args = parse_args()
     DRY_RUN = args.dry_run
+    if args.lang:
+        install_i18n.set_language(args.lang)
 
     data = scan_themes()
     if not data:
@@ -749,10 +776,12 @@ def main():
     if args.ventoy:
         if args.theme:
             final_path = select_theme_by_name(data, args.theme)
+        elif args.shuffle_time and not fancy_ui(args):
+            final_path = shuffle_pick(data)
         elif fancy_ui(args):
-            result = install_ui.run(data, THEME_QUOTES, velvet_available=False)
+            result = install_ui.run(data, THEME_QUOTES, False, THEME_ARCANA, args.shuffle_time)
             if result is None:
-                print(f"{C_ITALIC}Take your time.{C_RESET}")
+                print(f"{C_ITALIC}{t('take_your_time')}{C_RESET}")
                 return
             final_path = result[0]
         else:
@@ -781,11 +810,14 @@ def main():
     if args.theme:
         final_path = select_theme_by_name(data, args.theme)
         theme_name, variant_name, char_color = get_display_name(os.path.basename(final_path)), None, BG_RED
+    elif args.shuffle_time and not fancy_ui(args):
+        final_path = shuffle_pick(data)
+        theme_name, variant_name, char_color = get_display_name(os.path.basename(final_path)), None, BG_RED
     elif fancy_ui(args):
         velvet_available = is_uefi() and not os.path.exists(VELVET_ROOM_SCRIPT)
-        result = install_ui.run(data, THEME_QUOTES, velvet_available)
+        result = install_ui.run(data, THEME_QUOTES, velvet_available, THEME_ARCANA, args.shuffle_time)
         if result is None:
-            print(f"{C_ITALIC}Take your time.{C_RESET}")
+            print(f"{C_ITALIC}{t('take_your_time')}{C_RESET}")
             return
         final_path, theme_name, variant_name, velvet_choice = result
         velvet_room = velvet_room or velvet_choice
@@ -798,21 +830,20 @@ def main():
         clear_screen()
 
     # --- INSTALLATION ---
-    print_header("Installation", char_color)
-    print(f"Theme: {C_BOLD}{theme_name}{C_RESET}")
+    print_header(t("install_header"), char_color)
+    print(f"{t('theme')}: {C_BOLD}{theme_name}{C_RESET}")
     if variant_name:
-        print(f"Style: {C_BOLD}{variant_name}{C_RESET}")
-    print(f"Target: {os.path.join(grub_dir, 'themes', os.path.basename(final_path))}")
+        print(f"{t('style')}: {C_BOLD}{variant_name}{C_RESET}")
+    print(f"{t('target')}: {os.path.join(grub_dir, 'themes', os.path.basename(final_path))}")
     print("-" * 30)
     
     if not args.yes and not fancy:  # l'interface stylée a déjà demandé confirmation
-        confirm = input("Proceed with installation? [Y/n]: ")
-        if confirm.lower() in ["n", "no"]:
-            print(f"Aborted. {C_ITALIC}Take your time.{C_RESET}")
+        confirm = input(t("proceed"))
+        if confirm.strip() and not install_i18n.is_yes(confirm):
+            print(f"{t('aborted')} {C_ITALIC}{t('take_your_time')}{C_RESET}")
             return
         if not velvet_room and is_uefi() and not os.path.exists(VELVET_ROOM_SCRIPT):
-            answer = input("Add a 'Velvet Room' entry to open the UEFI firmware settings? [y/N]: ")
-            velvet_room = answer.lower() in ["y", "yes"]
+            velvet_room = install_i18n.is_yes(input(t("velvet_question")))
 
     if not install_theme(final_path, grub_dir, cmd, velvet_room):
         sys.exit(1)
@@ -822,9 +853,9 @@ def main():
         return
 
     print_quote(final_path, theme_name, fancy)
-    print(f"\n{BG_GREEN} SUCCESS {C_RESET} Installation complete!")
-    print("You need to reboot to see the changes.")
-    print("To undo: sudo python3 install.py --restore")
+    print(f"\n{BG_GREEN} SUCCESS {C_RESET} {t('success')}")
+    print(t("reboot_needed"))
+    print(t("undo"))
 
     if not args.yes:
         ask_reboot()

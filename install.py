@@ -90,19 +90,32 @@ CHARACTER_COLORS = {
 # --- NOMS D'AFFICHAGE SPÉCIAUX ---
 CHARACTER_DISPLAY_NAMES = {
     "caroline_justine": "Caroline & Justine",
-    "bui_stellar":   "Bui (Stellar)",
+    "bui_cosmic":    "Bui (Cosmic)",
     "luce_notte":    "Luce (Notte)",
-    "moko_beach":    "Moko (Beach)",
-    "soy_frontiere": "Soy (Frontiere)",
+    "moko_summer":   "Moko (Summer)",
+    "soy_pioneer":   "Soy (Pioneer)",
     "wind_vast":     "Wind (Vast)",
     "wonder_cny":    "Wonder (Chinese New Year)",
-    "wonder_beach":  "Wonder (Beach)",
+    "wonder_summer": "Wonder (Summer)",
     "wonder_valentine": "Wonder (Valentine)", # AJOUTÉ ICI
-    "marian_beach":  "Marian (Beach)",
-    "closer_beach":  "Closer (Beach)",
-    "puppet_beach":  "Puppet (Beach)",
+    "marian_summer": "Marian (Summer)",
+    "closer_summer": "Closer (Summer)",
+    "puppet_summer": "Puppet (Summer)",
     "rin_cny":       "Rin (Chinese New Year)",
     "mont_music":    "Mont (Music)"
+}
+
+# --- ANCIENS NOMS DE DOSSIERS ---
+# Variantes renommées avec leur nom officiel : les anciens noms marchent toujours
+# avec --theme, et --uninstall retire aussi les thèmes installés sous l'ancien nom
+RENAMED_THEMES = {
+    "bui_stellar":   "bui_cosmic",
+    "soy_frontiere": "soy_pioneer",
+    "wonder_beach":  "wonder_summer",
+    "closer_beach":  "closer_summer",
+    "moko_beach":    "moko_summer",
+    "marian_beach":  "marian_summer",
+    "puppet_beach":  "puppet_summer",
 }
 
 # Chemins
@@ -139,7 +152,7 @@ def get_char_color(char_name, default_color):
     """Cherche la couleur spécifique du perso, sinon retourne la couleur du jeu"""
     key = char_name.lower()
     for name, color in CHARACTER_COLORS.items():
-        # Match exact ou préfixe (pour gérer wonder_beach, wonder_cny, etc.)
+        # Match exact ou préfixe (pour gérer wonder_summer, wonder_cny, etc.)
         if key == name or key.startswith(name + "_"): 
             return color
     return default_color
@@ -386,6 +399,7 @@ def uninstall_themes(grub_dir, cmd):
     ours = {name for name in os.listdir(THEMES_DIR) if not name.startswith("_")}
     ours = {theme for game in ours if os.path.isdir(os.path.join(THEMES_DIR, game))
             for theme in os.listdir(os.path.join(THEMES_DIR, game))}
+    ours |= set(RENAMED_THEMES)
 
     installed = []
     if os.path.isdir(themes_target):
@@ -427,6 +441,9 @@ def list_themes(data):
 
 def find_theme(data, name):
     """Trouve un thème par nom de dossier ('joker') ou 'jeu/dossier' ('persona5_royal/joker')"""
+    game_prefix, _, folder_name = name.rpartition("/")
+    if folder_name in RENAMED_THEMES:
+        name = f"{game_prefix}/{RENAMED_THEMES[folder_name]}" if game_prefix else RENAMED_THEMES[folder_name]
     matches = []
     for game, characters in data.items():
         for variants in characters.values():

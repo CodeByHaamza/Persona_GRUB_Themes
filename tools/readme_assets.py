@@ -558,7 +558,7 @@ def showcase():
 # Ordre d'affichage : l'équipe dans l'ordre du jeu, puis le reste par ordre alphabétique
 ORDER = {
     "persona5_royal": ["joker", "skull", "panther", "morgana", "fox", "queen", "oracle", "noir", "crow", "violet"],
-    "persona5_phantom_x": ["wonder", "wonder_valentine", "wonder_beach", "wonder_cny"],
+    "persona5_phantom_x": ["wonder", "wonder_valentine", "wonder_summer", "wonder_cny"],
     "persona3_reload": ["makoto", "kotone", "yukari", "junpei", "akihiko", "mitsuru", "fuuka", "aigis", "aigis_fes",
                         "ken", "koromaru", "shinji", "metis"],
 }

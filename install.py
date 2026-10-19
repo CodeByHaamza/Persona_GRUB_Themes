@@ -3,6 +3,7 @@ import os
 import sys
 import glob
 import shutil
+import json
 import argparse
 import datetime
 import subprocess
@@ -24,6 +25,8 @@ BG_GREY   = "\033[48;5;240m\033[37m"
 BG_PINK   = "\033[48;5;205m\033[37m"
 BG_BROWN  = "\033[48;5;94m\033[37m"
 BG_TEAL   = "\033[48;5;30m\033[37m" 
+BG_BLACK  = "\033[40m\033[97m"
+C_ITALIC  = "\033[3m"
 
 # --- MAPPING COULEURS PERSONNAGES ---
 CHARACTER_COLORS = {
@@ -125,6 +128,29 @@ GRUB_CONFIG_FILE = "/etc/default/grub"
 # Copie de la config d'origine, faite une seule fois et jamais écrasée
 GRUB_CONFIG_ORIGINAL = GRUB_CONFIG_FILE + ".persona.orig"
 DRM_DIR = "/sys/class/drm"
+EFI_DIR = "/sys/firmware/efi"
+SHARED_DIR = os.path.join(THEMES_DIR, "_shared")
+
+# Entrée "Velvet Room" : ouvre les réglages UEFI (commande GRUB fwsetup)
+VELVET_ROOM_SCRIPT = "/etc/grub.d/42_persona_velvet_room"
+VELVET_ROOM_ICON = os.path.join(SHARED_DIR, "icons", "velvet.png")
+VELVET_ROOM_CONTENT = """#!/bin/sh
+# Added by Persona GRUB Themes (install.py --velvet-room). Remove with install.py --uninstall.
+cat << 'EOF'
+if [ "$grub_platform" = "efi" ]; then
+  menuentry 'Velvet Room (UEFI Firmware Settings)' --class velvet --id persona-velvet-room {
+    fwsetup
+  }
+fi
+EOF
+"""
+
+# Une réplique par jeu à la fin de l'installation
+GAME_QUOTES = {
+    "persona5_royal": "Looking cool, Joker!",
+    "persona5_phantom_x": "Take your heart.",
+    "persona3_reload": "Memento mori.",
+}
 
 # Mode simulation (--dry-run) : rien n'est écrit
 DRY_RUN = False
@@ -141,6 +167,17 @@ def clear_screen():
 
 def print_header(title, color=BG_RED):
     print(f"\n{color}  {title}  {C_RESET}\n")
+
+def print_ransom(text):
+    """Titre en lettres découpées, façon carte de visite des Phantom Thieves"""
+    styles = [BG_RED, BG_WHITE, BG_BLACK, BG_WHITE, BG_RED, BG_BLACK]
+    letters = [f"{styles[i % len(styles)]}{C_BOLD} {c} {C_RESET}" if c != " " else "  " for i, c in enumerate(text)]
+    print("\n  " + "".join(letters))
+
+def print_welcome():
+    print_ransom("PERSONA")
+    print(f"  {BG_BLACK}{C_BOLD} GRUB THEMES {C_RESET}{BG_RED}  {C_RESET}")
+    print(f"\n  {C_ITALIC}Welcome to the Velvet Room.{C_RESET}\n")
 
 def check_root():
     if os.geteuid() != 0:
@@ -372,8 +409,30 @@ def update_grub_binary(cmd):
         print(f"\n{BG_RED} ERROR {C_RESET} Failed to update GRUB.")
         return False
 
+# --- VELVET ROOM ---
+def is_uefi():
+    return os.path.isdir(EFI_DIR)
+
+def install_velvet_room():
+    if DRY_RUN:
+        print(f"{BG_YELLOW} DRY RUN {C_RESET} Would add the Velvet Room entry ({VELVET_ROOM_SCRIPT})")
+        return
+    with open(VELVET_ROOM_SCRIPT, "w") as f:
+        f.write(VELVET_ROOM_CONTENT)
+    os.chmod(VELVET_ROOM_SCRIPT, 0o755)
+    print(f"Added the Velvet Room entry ({VELVET_ROOM_SCRIPT})")
+
+def remove_velvet_room():
+    if not os.path.exists(VELVET_ROOM_SCRIPT):
+        return
+    if DRY_RUN:
+        print(f"{BG_YELLOW} DRY RUN {C_RESET} Would remove {VELVET_ROOM_SCRIPT}")
+        return
+    os.remove(VELVET_ROOM_SCRIPT)
+    print(f"Removed the Velvet Room entry ({VELVET_ROOM_SCRIPT})")
+
 # --- ACTIONS ---
-def install_theme(source_path, grub_dir, cmd):
+def install_theme(source_path, grub_dir, cmd, velvet_room=False):
     themes_target = os.path.join(grub_dir, "themes")
     target_path = os.path.join(themes_target, os.path.basename(source_path))
 
@@ -385,6 +444,12 @@ def install_theme(source_path, grub_dir, cmd):
         if os.path.exists(target_path):
             shutil.rmtree(target_path)
         shutil.copytree(source_path, target_path)
+
+    if velvet_room:
+        install_velvet_room()
+    # L'icône de l'entrée Velvet Room doit être dans le thème installé
+    if (velvet_room or os.path.exists(VELVET_ROOM_SCRIPT)) and not DRY_RUN:
+        shutil.copyfile(VELVET_ROOM_ICON, os.path.join(target_path, "icons", "velvet.png"))
 
     resolution = detect_resolution()
     if resolution:
@@ -414,6 +479,7 @@ def uninstall_themes(grub_dir, cmd):
     if not installed:
         print("No Persona theme found in " + themes_target)
 
+    remove_velvet_room()
     remove_theme_from_config()
     update_grub_binary(cmd)
 
@@ -429,7 +495,55 @@ def restore_config(cmd):
         backup_grub_config()
         shutil.copyfile(GRUB_CONFIG_ORIGINAL, GRUB_CONFIG_FILE)
         print(f"Restored {GRUB_CONFIG_FILE} from {GRUB_CONFIG_ORIGINAL}")
+    remove_velvet_room()
     update_grub_binary(cmd)
+
+# --- VENTOY ---
+def install_ventoy(source_path, mountpoint):
+    """Copie le thème sur une clé Ventoy et le déclare dans ventoy/ventoy.json"""
+    print_header("Ventoy", BG_BLUE)
+    if not os.path.isdir(mountpoint):
+        print(f"{BG_RED} ERROR {C_RESET} {mountpoint} is not a directory. Give the mount point of the Ventoy USB drive.")
+        sys.exit(1)
+
+    folder = os.path.basename(source_path)
+    ventoy_dir = os.path.join(mountpoint, "ventoy")
+    target_path = os.path.join(ventoy_dir, "themes", folder)
+    json_path = os.path.join(ventoy_dir, "ventoy.json")
+
+    config = {}
+    if os.path.exists(json_path):
+        try:
+            with open(json_path) as f:
+                config = json.load(f)
+        except ValueError:
+            print(f"{BG_RED} ERROR {C_RESET} {json_path} is not valid JSON. Fix it first, nothing was changed.")
+            sys.exit(1)
+    # On ne remplace que le réglage du thème, le reste de ventoy.json est gardé
+    config["theme"] = {
+        "file": f"/ventoy/themes/{folder}/theme.txt",
+        "gfxmode": detect_resolution() or "1920x1080",
+    }
+
+    if DRY_RUN:
+        print(f"{BG_YELLOW} DRY RUN {C_RESET} Would copy {source_path} -> {target_path}")
+        print(f"{BG_YELLOW} DRY RUN {C_RESET} Would write to {json_path}:")
+        print(json.dumps({"theme": config["theme"]}, indent=2))
+        return
+
+    if os.path.exists(target_path):
+        shutil.rmtree(target_path)
+    shutil.copytree(source_path, target_path)
+    print(f"Copied the theme to {target_path}")
+
+    if os.path.exists(json_path):
+        stamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        shutil.copyfile(json_path, f"{json_path}.bak.{stamp}")
+    with open(json_path, "w") as f:
+        json.dump(config, f, indent=2)
+        f.write("\n")
+    print(f"Updated {json_path}")
+    print(f"\n{BG_GREEN} SUCCESS {C_RESET} Boot from the USB drive to see the theme in Ventoy.")
 
 def list_themes(data):
     for game in sorted(data.keys()):
@@ -453,6 +567,14 @@ def find_theme(data, name):
                     matches.append(path)
     return matches
 
+def select_theme_by_name(data, name):
+    matches = find_theme(data, name)
+    if len(matches) != 1:
+        reason = "is ambiguous" if matches else "was not found"
+        print(f"{BG_RED} ERROR {C_RESET} Theme '{name}' {reason}. Use --list to see available themes.")
+        sys.exit(1)
+    return matches[0]
+
 def ask_reboot():
     reboot = input(f"\n{C_BOLD}Do you want to reboot now? [y/N]: {C_RESET}")
     if reboot.lower() in ["y", "yes"]:
@@ -468,6 +590,10 @@ def parse_args():
     parser.add_argument("--list", action="store_true", help="list available themes")
     parser.add_argument("--uninstall", action="store_true", help="remove installed Persona themes and the GRUB_THEME line")
     parser.add_argument("--restore", action="store_true", help="restore /etc/default/grub as it was before the first install")
+    parser.add_argument("--velvet-room", action="store_true",
+                        help="add a 'Velvet Room' entry that opens the UEFI firmware settings")
+    parser.add_argument("--ventoy", metavar="MOUNTPOINT",
+                        help="install the theme on a Ventoy USB drive instead of the system GRUB")
     parser.add_argument("--dry-run", action="store_true", help="show what would change without touching anything")
     parser.add_argument("-y", "--yes", action="store_true", help="do not ask for confirmation or reboot")
     return parser.parse_args()
@@ -522,6 +648,16 @@ def main():
         list_themes(data)
         return
 
+    if args.ventoy:
+        if args.theme:
+            final_path = select_theme_by_name(data, args.theme)
+        else:
+            clear_screen()
+            print_welcome()
+            final_path = interactive_select(data)[0]
+        install_ventoy(final_path, args.ventoy)
+        return
+
     if not DRY_RUN:
         check_root()
     if not os.path.isfile(GRUB_CONFIG_FILE):
@@ -537,16 +673,11 @@ def main():
         return
 
     if args.theme:
-        matches = find_theme(data, args.theme)
-        if len(matches) != 1:
-            reason = "is ambiguous" if matches else "was not found"
-            print(f"{BG_RED} ERROR {C_RESET} Theme '{args.theme}' {reason}. Use --list to see available themes.")
-            sys.exit(1)
-        final_path = matches[0]
+        final_path = select_theme_by_name(data, args.theme)
         theme_name, variant_name, char_color = get_display_name(os.path.basename(final_path)), None, BG_RED
     else:
         clear_screen()
-        print_header("PERSONA GRUB THEME INSTALLER")
+        print_welcome()
         final_path, theme_name, variant_name, char_color = interactive_select(data)
         clear_screen()
 
@@ -558,20 +689,25 @@ def main():
     print(f"Target: {os.path.join(grub_dir, 'themes', os.path.basename(final_path))}")
     print("-" * 30)
     
+    velvet_room = args.velvet_room
     if not args.yes:
         confirm = input("Proceed with installation? [Y/n]: ")
         if confirm.lower() in ["n", "no"]:
-            print("Aborted.")
+            print(f"Aborted. {C_ITALIC}Take your time.{C_RESET}")
             return
+        if not velvet_room and is_uefi() and not os.path.exists(VELVET_ROOM_SCRIPT):
+            answer = input("Add a 'Velvet Room' entry to open the UEFI firmware settings? [y/N]: ")
+            velvet_room = answer.lower() in ["y", "yes"]
 
-    if not install_theme(final_path, grub_dir, cmd):
+    if not install_theme(final_path, grub_dir, cmd, velvet_room):
         sys.exit(1)
 
     if DRY_RUN:
         print(f"\n{BG_YELLOW} DRY RUN {C_RESET} Nothing was changed.")
         return
 
-    print("\nEnjoy your Persona GRUB Theme! :)")
+    quote = GAME_QUOTES.get(os.path.basename(os.path.dirname(final_path)), "Enjoy your Persona GRUB Theme!")
+    print(f"\n  {C_ITALIC}{C_BOLD}{quote}{C_RESET}")
     print(f"\n{BG_GREEN} SUCCESS {C_RESET} Installation complete!")
     print("You need to reboot to see the changes.")
     print("To undo: sudo python3 install.py --restore")

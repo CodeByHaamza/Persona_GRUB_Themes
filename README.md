@@ -195,7 +195,13 @@ cd Persona_GRUB_Themes
 sudo python3 install.py
 ```
 
-Select your game, your character and its outfit, confirm, then reboot.
+Pick your game, then your character and its outfit with the arrow keys: each theme is **previewed in colour right in the terminal**, with the phrase of its All-Out Attack. Confirm, then reboot.
+
+<div align="center">
+<img src=".github/readme/installer.png" width="100%" alt="The installer in the terminal">
+</div>
+
+The menus fall back to simple numbered lists on terminals without colours, with `NO_COLOR`, or with `--plain`.
 
 #### Installer options
 
@@ -206,6 +212,7 @@ sudo python3 install.py --dry-run          # show what would change, touch nothi
 sudo python3 install.py --uninstall        # remove the Persona themes from GRUB
 sudo python3 install.py --restore          # restore /etc/default/grub as it was before the first install
 sudo python3 install.py --theme joker -y   # no questions (scripts)
+sudo python3 install.py --plain            # simple numbered menus
 sudo python3 install.py --velvet-room      # add the Velvet Room entry (see below)
 python3 install.py --ventoy /media/usb     # install on a Ventoy USB drive (see below)
 ```

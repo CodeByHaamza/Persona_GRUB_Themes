@@ -8,6 +8,11 @@ import argparse
 import datetime
 import subprocess
 
+try:
+    import install_ui  # interface stylée (flèches, aperçus, animations)
+except ImportError:
+    install_ui = None
+
 # --- CONFIGURATION DES COULEURS (ANSI) ---
 C_RESET   = "\033[0m"
 C_BOLD    = "\033[1m"
@@ -93,6 +98,8 @@ CHARACTER_COLORS = {
 # --- NOMS D'AFFICHAGE SPÉCIAUX ---
 CHARACTER_DISPLAY_NAMES = {
     "caroline_justine": "Caroline & Justine",
+    "black_mask":    "Black Mask",
+    "aigis_fes":     "Aigis (FES)",
     "bui_cosmic":    "Bui (Cosmic)",
     "luce_notte":    "Luce (Notte)",
     "moko_summer":   "Moko (Summer)",
@@ -640,9 +647,16 @@ def find_theme(data, name):
                     matches.append(path)
     return matches
 
-def print_quote(theme_path, theme_name):
+def fancy_ui(args):
+    return install_ui is not None and not args.plain and install_ui.available()
+
+def print_quote(theme_path, theme_name, fancy=False):
     """La phrase de l'All-Out Attack du thème installé, sinon une réplique du jeu"""
     folder = os.path.basename(theme_path)
+    if fancy:
+        game = os.path.basename(os.path.dirname(theme_path))
+        install_ui.outro(THEME_QUOTES.get(folder) or GAME_QUOTES.get(game), theme_name if folder in THEME_QUOTES else "", game)
+        return
     if folder in THEME_QUOTES:
         print(f"\n  {C_ITALIC}{C_BOLD}“{THEME_QUOTES[folder]}”{C_RESET} — {theme_name}")
     else:
@@ -676,6 +690,7 @@ def parse_args():
                         help="add a 'Velvet Room' entry that opens the UEFI firmware settings")
     parser.add_argument("--ventoy", metavar="MOUNTPOINT",
                         help="install the theme on a Ventoy USB drive instead of the system GRUB")
+    parser.add_argument("--plain", action="store_true", help="use the simple numbered menus")
     parser.add_argument("--dry-run", action="store_true", help="show what would change without touching anything")
     parser.add_argument("-y", "--yes", action="store_true", help="do not ask for confirmation or reboot")
     return parser.parse_args()
@@ -733,6 +748,12 @@ def main():
     if args.ventoy:
         if args.theme:
             final_path = select_theme_by_name(data, args.theme)
+        elif fancy_ui(args):
+            result = install_ui.run(data, THEME_QUOTES, velvet_available=False)
+            if result is None:
+                print(f"{C_ITALIC}Take your time.{C_RESET}")
+                return
+            final_path = result[0]
         else:
             clear_screen()
             print_welcome()
@@ -754,9 +775,21 @@ def main():
         uninstall_themes(grub_dir, cmd)
         return
 
+    fancy = False
+    velvet_room = args.velvet_room
     if args.theme:
         final_path = select_theme_by_name(data, args.theme)
         theme_name, variant_name, char_color = get_display_name(os.path.basename(final_path)), None, BG_RED
+    elif fancy_ui(args):
+        velvet_available = is_uefi() and not os.path.exists(VELVET_ROOM_SCRIPT)
+        result = install_ui.run(data, THEME_QUOTES, velvet_available)
+        if result is None:
+            print(f"{C_ITALIC}Take your time.{C_RESET}")
+            return
+        final_path, theme_name, variant_name, velvet_choice = result
+        velvet_room = velvet_room or velvet_choice
+        char_color = get_char_color(theme_name.split(" ")[0].lower(), BG_RED)
+        fancy = True
     else:
         clear_screen()
         print_welcome()
@@ -771,8 +804,7 @@ def main():
     print(f"Target: {os.path.join(grub_dir, 'themes', os.path.basename(final_path))}")
     print("-" * 30)
     
-    velvet_room = args.velvet_room
-    if not args.yes:
+    if not args.yes and not fancy:  # l'interface stylée a déjà demandé confirmation
         confirm = input("Proceed with installation? [Y/n]: ")
         if confirm.lower() in ["n", "no"]:
             print(f"Aborted. {C_ITALIC}Take your time.{C_RESET}")
@@ -788,7 +820,7 @@ def main():
         print(f"\n{BG_YELLOW} DRY RUN {C_RESET} Nothing was changed.")
         return
 
-    print_quote(final_path, theme_name)
+    print_quote(final_path, theme_name, fancy)
     print(f"\n{BG_GREEN} SUCCESS {C_RESET} Installation complete!")
     print("You need to reboot to see the changes.")
     print("To undo: sudo python3 install.py --restore")

@@ -6,6 +6,7 @@ Génère les visuels du README dans .github/readme/ :
   - divider_p5.svg, divider_p3.svg                (séparateurs animés)
   - showcase.gif                                  (diaporama des previews)
   - thumbs/<jeu>/<theme>.jpg                      (miniatures de la galerie)
+  - themes/_shared/terminal_previews.json         (aperçus affichés par l'installeur dans le terminal)
 et met à jour la galerie du README (entre les balises <!-- gallery:<jeu> -->)
 ainsi que le badge de progression HD (<!-- hd-progress -->).
 
@@ -17,8 +18,10 @@ Usage :
 
 Dépendances (outil de dev uniquement) : Pillow, fontTools, ffmpeg (optionnel, GIF plus léger)
 """
+import base64
 import glob
 import html
+import json
 import math
 import os
 import random
@@ -27,6 +30,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import zlib
 
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
@@ -469,6 +473,25 @@ def thumbnails():
     return count
 
 
+# Aperçus pour le terminal : 80x45 pixels, affichés en demi-blocs (2 pixels par caractère)
+TERMINAL_PREVIEW_SIZE = (80, 45)
+TERMINAL_PREVIEWS = os.path.join(THEMES_DIR, "_shared", "terminal_previews.json")
+
+
+def terminal_previews():
+    w, h = TERMINAL_PREVIEW_SIZE
+    previews = {}
+    for preview in sorted(glob.glob(os.path.join(PREVIEWS_DIR, "*", "*.png"))):
+        game = os.path.basename(os.path.dirname(preview))
+        theme = os.path.basename(preview)[:-4]
+        image = Image.open(preview).convert("RGB").resize((w, h), Image.LANCZOS)
+        previews[f"{game}/{theme}"] = base64.b64encode(zlib.compress(image.tobytes(), 9)).decode("ascii")
+    with open(TERMINAL_PREVIEWS, "w") as f:
+        json.dump({"width": w, "height": h, "themes": previews}, f, separators=(",", ":"))
+        f.write("\n")
+    return len(previews)
+
+
 SHOWCASE = [
     ("persona5_royal", "joker", "Joker"),
     ("persona5_phantom_x", "wonder", "Wonder"),
@@ -647,6 +670,7 @@ def main():
             f.write(content)
         print(f"{name:20} {len(content) // 1024} KB")
     print(f"thumbs               {thumbnails()} files")
+    print(f"terminal previews    {terminal_previews()} themes")
     gif = showcase()
     print(f"showcase.gif         {os.path.getsize(gif) // 1024} KB")
     update_readme()

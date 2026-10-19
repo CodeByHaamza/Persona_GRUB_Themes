@@ -18,6 +18,7 @@ Usage :
 Dépendances (outil de dev uniquement) : Pillow, fontTools, ffmpeg (optionnel, GIF plus léger)
 """
 import glob
+import html
 import math
 import os
 import random
@@ -575,6 +576,13 @@ def is_hd(game, theme):
     return w >= 1920 and h >= 1080 and abs(w / h - 16 / 9) / (16 / 9) < 0.01
 
 
+def tooltip(theme):
+    """Au survol : la phrase de l'All-Out Attack du thème"""
+    import install
+    quote = install.THEME_QUOTES.get(theme)
+    return f' title="“{html.escape(quote)}”"' if quote else ""
+
+
 def gallery_rows(game, themes):
     import install  # noms d'affichage des variantes (wonder_cny -> Wonder (Chinese New Year))
     cells = []
@@ -582,7 +590,7 @@ def gallery_rows(game, themes):
         name = NAMES.get(theme) or install.CHARACTER_DISPLAY_NAMES.get(theme) or theme.replace("_", " ").title()
         cells.append(
             f'<td align="center"><a href="previews/{game}/{theme}.png">'
-            f'<img src=".github/readme/thumbs/{game}/{theme}.jpg" width="260" alt="{name}"></a>'
+            f'<img src=".github/readme/thumbs/{game}/{theme}.jpg" width="260" alt="{name}"{tooltip(theme)}></a>'
             f"<br><b>{name}</b><br><sub>{'✅ HD' if is_hd(game, theme) else '⏳ HD soon'}</sub></td>"
         )
     rows = ["<tr>" + "".join(cells[i:i + COLUMNS]) + "</tr>" for i in range(0, len(cells), COLUMNS)]

@@ -145,11 +145,84 @@ fi
 EOF
 """
 
-# Une réplique par jeu à la fin de l'installation
+# Une réplique par jeu, quand le thème n'a pas de phrase (voir THEME_QUOTES)
 GAME_QUOTES = {
     "persona5_royal": "Looking cool, Joker!",
     "persona5_phantom_x": "Take your heart.",
     "persona3_reload": "Memento mori.",
+}
+
+# La phrase écrite sur l'All-Out Attack officiel de chaque thème, recopiée telle quelle
+# (pas d'entrée = texte illisible ou absent de l'image actuelle : à compléter avec les images HD)
+THEME_QUOTES = {
+    # --- Persona 3 Reload ---
+    "aigis":            "TARGET NEUTRALIZED.",
+    "aigis_fes":        "TARGET NEUTRALIZED.",
+    "akihiko":          "ON TO THE NEXT BOUT.",
+    "fuuka":            "I'LL BE YOUR SUPPORT.",
+    "junpei":           "THAT'S THE GAME!",
+    "ken":              "DON'T LOOK DOWN ON ME.",
+    "koromaru":         "WOOF! WOOF! WOOF!",
+    "kotone":           "PERFECTLY ACCOMPLISHED!!",
+    "makoto":           "DONE AND DUSTED.",
+    "metis":            "ANYTHING FOR HER.",
+    "mitsuru":          "KNEEL BEFORE ME.",
+    "shinji":           "DON'T WASTE YOUR BREATH.",
+    "yukari":           "THERE YOU HAVE IT",
+
+    # --- Persona 5 Royal ---
+    "joker":            "THE SHOW'S OVER",
+    "skull":            "FREAKIN' BORING!",
+    "panther":          "OMG!! We are SO awesome",
+    "morgana":          "MISSION ACCOMPLISHED",
+    "fox":              "IT WAS FUN WHILE IT LASTED. GOODBYE",
+    "queen":            "JUSTICE HAS PREVAILED.",
+    "oracle":           "Git Gud",
+    "noir":             "Adieu.",
+    "crow":             "My sole interest is uncovering the truth.",
+    "violet":           "Beauty is Devotion",
+    "black_mask":       "I DECIDE THE TRUTH",
+    "caroline_justine": "Don't be so cocky",
+    "lavenza":          "Don't be naïve",
+
+    # --- Persona 5: The Phantom X ---
+    "wonder":           "GO BEYOND",
+    "wonder_summer":    "GO BEYOND",
+    "wonder_cny":       "Wish you a bountiful year",
+    "wonder_valentine": "Happy Valentine",
+    "ange":             "Et Misericordia",
+    "berry":            "I'll cute-ly destroy your eardrums.",
+    "bui":              "GAME OVER",
+    "bui_cosmic":       "ONE MORE GAME",
+    "cattle":           "WE SEE YOU.",
+    "cherish":          "Be true to my friend",
+    "chord":            "LIVING FOR TODAY",
+    "closer":           "It's cool!!!",
+    "closer_summer":    "Summer Sizzle Slam",
+    "fleuret":          "Êtes-vous prêts",
+    "howler":           "WELCOME SHIBUYA",
+    "key":              "Exorcizamus te",
+    "leon":             "HERO ON STAGE",
+    "luce":             "Or che mi conoscete",
+    "luce_notte":       "Chi trova un amico trova un tesoro",
+    "marian":           "Sterilization Completed",
+    "marian_summer":    "Heal your wounds.",
+    "matoi":            "I Fight What You Fear",
+    "messa":            "Now, you are free",
+    "moko":             "Shoot for the Moon",
+    "moko_summer":      "MAKING WAVES THIS SUMMER!",
+    "mont":             "Take over the previous self",
+    "okyann":           "GIRL POWER!",
+    "phoebe":           "Cheers to your soul!",
+    "puppet":           "Shattered Dreams",
+    "riddle":           "I AM CURIOUS!",
+    "rin_cny":          "恭喜發財",
+    "sepia":            "To thine own self be true.",
+    "soy":              "WOULD YOU LIKE SOME MORE?",
+    "soy_pioneer":      "YOU'VE GIVEN ME A TASTE FOR LIFE",
+    "turbo":            "Dream of Velocity",
+    "wind":             "Wish you well",
+    "wind_vast":        "One Day One Life",
 }
 
 # Mode simulation (--dry-run) : rien n'est écrit
@@ -567,6 +640,15 @@ def find_theme(data, name):
                     matches.append(path)
     return matches
 
+def print_quote(theme_path, theme_name):
+    """La phrase de l'All-Out Attack du thème installé, sinon une réplique du jeu"""
+    folder = os.path.basename(theme_path)
+    if folder in THEME_QUOTES:
+        print(f"\n  {C_ITALIC}{C_BOLD}“{THEME_QUOTES[folder]}”{C_RESET} — {theme_name}")
+    else:
+        game = os.path.basename(os.path.dirname(theme_path))
+        print(f"\n  {C_ITALIC}{C_BOLD}{GAME_QUOTES.get(game, 'Enjoy your Persona GRUB Theme!')}{C_RESET}")
+
 def select_theme_by_name(data, name):
     matches = find_theme(data, name)
     if len(matches) != 1:
@@ -706,8 +788,7 @@ def main():
         print(f"\n{BG_YELLOW} DRY RUN {C_RESET} Nothing was changed.")
         return
 
-    quote = GAME_QUOTES.get(os.path.basename(os.path.dirname(final_path)), "Enjoy your Persona GRUB Theme!")
-    print(f"\n  {C_ITALIC}{C_BOLD}{quote}{C_RESET}")
+    print_quote(final_path, theme_name)
     print(f"\n{BG_GREEN} SUCCESS {C_RESET} Installation complete!")
     print("You need to reboot to see the changes.")
     print("To undo: sudo python3 install.py --restore")

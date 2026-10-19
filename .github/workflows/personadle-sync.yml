@@ -51,6 +51,7 @@ jobs:
           - [ ] Create the theme folder and its \`theme.txt\`
           - [ ] Add the preview to \`previews/$game/$folder.png\`
           - [ ] Add the image source to \`SOURCES.md\`
+          - [ ] Add the phrase written on the All-Out Attack to \`THEME_QUOTES\` in \`install.py\`
           - [ ] Run \`python3 tools/check_contrast.py --fix\` and \`python3 tools/readme_assets.py\`
 
           _Opened automatically by the "Track personadle All-Out Attacks" workflow._

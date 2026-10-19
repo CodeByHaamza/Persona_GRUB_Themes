@@ -516,7 +516,10 @@ The **code** is under the [MIT License](LICENSE). All **artwork, characters and 
 
 *"I am thou, thou art I... Thou hast acquired a new bootloader theme!"*
 
+<a href="https://github.com/CodeByHaamza"><img src=".github/readme/author_card.svg" width="80%" alt="Confidant: CodeByHaamza · Arcana: The Fool · Rank MAX"></a>
+
 [![GitHub](https://img.shields.io/badge/GitHub-CodeByHaamza-E60012?style=for-the-badge&logo=github&labelColor=0D0D0D)](https://github.com/CodeByHaamza)
+[![PersonaDLE](https://img.shields.io/badge/Play-PersonaDLE-1E6BFF?style=for-the-badge&labelColor=0D0D0D)](https://github.com/CodeByHaamza/personadle)
 [![Email](https://img.shields.io/badge/Email-Contact_me-1E6BFF?style=for-the-badge&logo=gmail&logoColor=white&labelColor=0D0D0D)](mailto:hamza.karrouchi.dev@gmail.com)
 
 [⬆ Back to top](#readme)

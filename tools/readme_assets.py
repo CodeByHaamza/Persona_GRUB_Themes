@@ -6,6 +6,7 @@ Génère les visuels du README dans .github/readme/ :
   - game_p4r.svg                                  (Persona 4 Revival : bientôt)
   - divider_p5.svg, divider_p3.svg                (séparateurs animés)
   - showcase.gif                                  (diaporama des previews)
+  - author_card.svg                               (carte de Confidant de l'auteur, avec avatar.jpg)
   - thumbs/<jeu>/<theme>.jpg                      (miniatures de la galerie)
   - themes/_shared/terminal_previews.json         (aperçus affichés par l'installeur dans le terminal)
 et met à jour la galerie du README (entre les balises <!-- gallery:<jeu> -->)
@@ -502,6 +503,83 @@ def calling_card():
     return svg(w, h, body, style, HALFTONE)
 
 
+# --- CARTE DE CONFIDANT DE L'AUTEUR ---
+AUTHOR = "CodeByHaamza"
+AUTHOR_AVATAR = os.path.join(OUT_DIR, "avatar.jpg")
+
+
+def author_card():
+    """Carte de Confidant façon P5 : avatar, pseudo, Arcane, rang qui monte jusqu'à MAX"""
+    w, h = 960, 320
+    rng = random.Random(7)
+    with open(AUTHOR_AVATAR, "rb") as f:
+        avatar = base64.b64encode(f.read()).decode("ascii")
+
+    ranks = 10
+    rank_x, rank_y, rank_gap = 430, 236, 34
+    diamonds = "".join(
+        f'<g class="rank" style="animation-delay:{1.2 + i * 0.12:.2f}s">'
+        f'<polygon points="{rank_x + i * rank_gap},{rank_y - 11} {rank_x + i * rank_gap + 11},{rank_y} '
+        f'{rank_x + i * rank_gap},{rank_y + 11} {rank_x + i * rank_gap - 11},{rank_y}" fill="{RED}" stroke="{WHITE}" stroke-width="2"/></g>'
+        for i in range(ranks)
+    )
+    empty = "".join(
+        f'<polygon points="{rank_x + i * rank_gap},{rank_y - 11} {rank_x + i * rank_gap + 11},{rank_y} '
+        f'{rank_x + i * rank_gap},{rank_y + 11} {rank_x + i * rank_gap - 11},{rank_y}" fill="none" stroke="#555" stroke-width="2"/>'
+        for i in range(ranks)
+    )
+    # Lettres découpées visibles sur fond noir, taille ajustée pour tenir dans la carte
+    styles = [(RED, WHITE), (WHITE, BLACK), (WHITE, RED), (RED, BLACK), ("#3A3A3A", WHITE)]
+    _, name_w = ransom(AUTHOR.upper(), 0, 0, 40, seed=27, styles=styles)
+    size = min(40, 40 * (w - 412 - 24) / name_w)
+    _, name_w = ransom(AUTHOR.upper(), 0, 0, size, seed=27, styles=styles)
+    name, _ = ransom(AUTHOR.upper(), 412 + name_w / 2, 112, size, seed=27, delay=0.5, step=0.05, styles=styles)
+    kicker = FONTS["inter_black_italic"]
+    small = FONTS["inter_bold"]
+    body = f"""
+<rect width="{w}" height="{h}" fill="{BLACK}"/>
+<rect width="{w}" height="{h}" fill="url(#dots)" opacity=".16"/>
+<g class="spin"><polygon points="{star_points(820, 60, 230, 110, 14, rng)}" fill="{DARK_RED}" opacity=".55"/></g>
+<g class="slide"><polygon points="-20,{h - 64} {w + 20},{h - 110} {w + 20},{h - 92} -20,{h - 44}" fill="{RED}"/></g>
+
+<g class="pop" style="animation-delay:.15s">
+  <polygon points="58,34 330,22 312,290 40,300" fill="{RED}"/>
+  <polygon points="48,26 320,16 302,282 30,292" fill="{WHITE}"/>
+  <image href="data:image/jpeg;base64,{avatar}" x="40" y="24" width="270" height="262"
+         preserveAspectRatio="xMidYMid slice" clip-path="url(#avatar-clip)"/>
+</g>
+
+<g class="fade" style="animation-delay:.3s">
+  <path d="{kicker.path("CONFIDANT", 22, 412, 62, 6)}" fill="{RED}"/>
+</g>
+{name}
+<g class="fade" style="animation-delay:1.0s">
+  <path d="{small.path("ARCANA", 14, 412, 172, 4)}" fill="#999"/>
+  <path d="{kicker.path("THE FOOL", 30, 412, 206, 2)}" fill="{WHITE}"/>
+  <path d="{small.path("THE WILD CARD", 14, 412 + kicker.width("THE FOOL", 30, 2) + 18, 205, 3)}" fill="{RED}"/>
+</g>
+{empty}
+{diamonds}
+<g class="stamp">
+  <g transform="rotate(-12 {rank_x + ranks * rank_gap + 46} {rank_y})">
+    <rect x="{rank_x + ranks * rank_gap + 4}" y="{rank_y - 20}" width="88" height="40" fill="{WHITE}" stroke="{RED}" stroke-width="4"/>
+    <path d="{kicker.centered("MAX", 26, rank_x + ranks * rank_gap + 48, rank_y, 3)}" fill="{RED}"/>
+  </g>
+</g>
+<g class="fade" style="animation-delay:2.6s">
+  <path d="{small.path("Creator of Persona GRUB Themes  ·  PersonaDLE", 15, 412, 290, 1)}" fill="{WHITE}"/>
+</g>
+"""
+    style = P5_STYLE + """
+.rank{animation:rank .35s cubic-bezier(.3,1.6,.5,1) both;transform-box:fill-box;transform-origin:center}
+@keyframes rank{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+.stamp{animation:stamp .5s cubic-bezier(.3,1.8,.5,1) 2.5s both;transform-box:fill-box;transform-origin:center}
+@keyframes stamp{0%{transform:scale(3);opacity:0}100%{transform:scale(1);opacity:1}}
+"""
+    defs = HALFTONE + '<clipPath id="avatar-clip"><polygon points="48,26 320,16 302,282 30,292"/></clipPath>'
+    return svg(w, h, body, style, defs)
+
+
 # --- MINIATURES ET DIAPORAMA ---
 def thumbnails():
     count = 0
@@ -715,6 +793,7 @@ def main():
         "divider_p5.svg": divider_p5(),
         "divider_p3.svg": divider_p3(),
         "calling_card.svg": calling_card(),
+        "author_card.svg": author_card(),
     }
     for name, content in files.items():
         with open(os.path.join(OUT_DIR, name), "w") as f:

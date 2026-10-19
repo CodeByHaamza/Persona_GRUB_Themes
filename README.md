@@ -492,7 +492,8 @@ Contributions are warmly welcomed! Here's how you can help:
 
 ### Contribution Ideas
 
-- 🎨 **Add new character themes** from Persona 4, Persona Q, etc.
+- 🎨 **Add new character themes** that have an official All-Out Attack (new P5X characters, Persona 4 Revival on release...)
+- 🗺️ **Pick an item** from the [Roadmap](./ROADMAP.md)
 - 🐛 **Report bugs** or compatibility issues
 - 📖 **Improve documentation** or add translations
 - 💡 **Suggest features** or enhancements
@@ -501,6 +502,7 @@ Contributions are warmly welcomed! Here's how you can help:
 
 ### Guidelines
 
+- **Official All-Out Attacks only**: a character is added only if an official All-Out Attack finisher image exists for them (see the [Roadmap](./ROADMAP.md#-golden-rule-official-all-out-attacks-only))
 - Follow existing theme structure
 - Test themes before submitting
 - Provide preview images

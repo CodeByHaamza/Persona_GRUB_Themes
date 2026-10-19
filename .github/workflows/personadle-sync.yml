@@ -1,0 +1,61 @@
+name: Track personadle All-Out Attacks
+
+# Every official All-Out Attack listed in personadle should have a theme here.
+# This workflow opens one issue per missing theme (never twice for the same one).
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # every Monday
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  missing-themes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find official All-Out Attacks without a theme
+        run: |
+          python3 tools/personadle_sync.py
+          python3 tools/personadle_sync.py --json > missing.json
+
+      - name: Open an issue for each missing theme
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create "missing theme" --color E60012 \
+            --description "Official All-Out Attack without a theme yet" 2>/dev/null || true
+          gh issue list --state all --limit 1000 --json title --jq '.[].title' > existing.txt
+
+          jq -c '.[]' missing.json | while read -r character; do
+            name=$(jq -r .name <<< "$character")
+            folder=$(jq -r .folder <<< "$character")
+            game=$(jq -r .game <<< "$character")
+            title="[Missing theme] $name"
+
+            if grep -Fxq "$title" existing.txt; then
+              echo "Already tracked: $title"
+              continue
+            fi
+
+            body=$(cat <<BODY
+          **$name** has an official All-Out Attack (listed in [personadle](https://github.com/CodeByHaamza/personadle/tree/main/allOutAttackMode)) but no theme yet.
+
+          Theme folder: \`themes/$game/$folder\`
+
+          - [ ] Extract the All-Out Attack in high resolution from the game (1920×1080 minimum, 16:9)
+          - [ ] Create the theme folder and its \`theme.txt\`
+          - [ ] Add the preview to \`previews/$game/$folder.png\`
+          - [ ] Add the image source to \`SOURCES.md\`
+          - [ ] Run \`python3 tools/check_contrast.py --fix\` and \`python3 tools/readme_assets.py\`
+
+          _Opened automatically by the "Track personadle All-Out Attacks" workflow._
+          BODY
+            )
+            gh issue create --title "$title" --label "missing theme" --body "$body"
+            echo "Opened: $title"
+          done

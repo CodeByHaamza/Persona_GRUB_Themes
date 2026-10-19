@@ -9,6 +9,7 @@
 [![Games](https://img.shields.io/badge/P5R%20%C2%B7%20P5X%20%C2%B7%20P3R-games-1E6BFF?style=for-the-badge&labelColor=0D0D0D)](#-the-gallery)
 [![GRUB2](https://img.shields.io/badge/GRUB-2-1E6BFF?style=for-the-badge&logo=gnu&logoColor=white&labelColor=0D0D0D)](https://www.gnu.org/software/grub/)
 [![License](https://img.shields.io/badge/code-MIT-FFFFFF?style=for-the-badge&labelColor=0D0D0D)](LICENSE)
+[![Tests](https://img.shields.io/github/actions/workflow/status/CodeByHaamza/Persona_GRUB_Themes/tests.yml?branch=main&style=for-the-badge&label=tests&labelColor=0D0D0D)](https://github.com/CodeByHaamza/Persona_GRUB_Themes/actions/workflows/tests.yml)
 <!-- hd-progress -->[![HD artwork](https://img.shields.io/badge/HD_artwork-20%2F68-E60012?style=for-the-badge&labelColor=0D0D0D)](#-the-gallery)<!-- /hd-progress -->
 
 ### Turn your boot menu into a Persona menu.
@@ -462,6 +463,7 @@ Contributions are welcome! Fork the repository, create a branch, and open a pull
 
 ### Guidelines
 - Follow the existing theme structure
+- Run the tests with `python3 -m unittest discover -s tests` (no dependency). They also run on every pull request.
 - Check readability with `python3 tools/check_contrast.py` (needs Pillow; `--fix` adjusts the text colours)
 - Regenerate the README visuals with `python3 tools/readme_assets.py` (needs Pillow and fontTools)
 - Test themes before submitting, and provide a preview image

@@ -390,6 +390,13 @@ Persona_GRUB_Themes/
 ## 7. CI / Automation
 
 ### 7.1 Theme validation
+- [x] `tests/` (standard library only, `python3 -m unittest discover -s tests`) and `.github/workflows/tests.yml`, run on every pull request with Python 3.8 and 3.12:
+  - installer: install, backups, restore, uninstall, `--dry-run`, user settings kept, old outfit names, numbered menus, French, Shuffle Time
+  - Velvet Room, Ventoy, All-Out Attack phrases and Arcana
+  - every theme complete, files referenced by `theme.txt`, previews, unique folder names
+  - languages: same keys and placeholders in the 6 files
+  - interface: rendering, previews, Dark Hour, and a real run in a pseudo-terminal
+  - `pyflakes` and `tools/check_contrast.py`
 - [ ] GitHub Action on every PR:
   - every `theme.txt` parses and every referenced file exists,
   - background ≥ 1920×1080 and the correct aspect ratio,
@@ -484,6 +491,7 @@ Matching themes for every step of the boot, built from the same official AOA ima
 | Variant names | P5X outfits renamed to their official names: Bui Cosmic, Soy Pioneer, Summer (instead of Stellar, Frontiere, Beach). |
 | Installer extras | Velvet Room entry (`--velvet-room`), Ventoy support (`--ventoy`), Persona-styled messages, and the phrase of each theme's All-Out Attack after the install (63/68). |
 | Installer interface | Arrow-key menus with animations, game cards and a live colour preview of each theme in the terminal (`install_ui.py`). |
+| Tests | 38 tests and a GitHub Action on every pull request (lint, tests, readability). |
 | Installer fun | Shuffle Time, the Dark Hour, 3 animated easter eggs, Arcana, 6 languages. |
 | HD tracking | ✅ / ⏳ per theme in the gallery and an "HD artwork 20/68" badge, updated by `tools/readme_assets.py`. |
 | personadle tracking | Weekly GitHub Action opening a "[Missing theme]" issue for each official All-Out Attack without a theme. |

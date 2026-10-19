@@ -13,7 +13,7 @@ terminal-height: "100%"
   item_color = "#ECE9DB"
   item_font = "DejaVu Sans Regular 14"
   selected_item_font = "DejaVu Sans Bold 14"
-  selected_item_color = "#ECE9DB"
+  selected_item_color = "#000000"
   icon_width = 48
   icon_height = 48
   item_icon_space = 20
@@ -32,7 +32,7 @@ terminal-height: "100%"
 	width = 29%
   font = "DejaVu Sans Bold 14"
 	text_color = "#fff"
-	fg_color = "#0066FF"
+	fg_color = "#D670B7"
 	border_color = "#000"
 	bg_color = "#000"
 	text = "Your OS will be booted in %d seconds"

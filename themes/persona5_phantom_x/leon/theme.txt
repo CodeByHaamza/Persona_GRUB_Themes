@@ -32,7 +32,7 @@ terminal-height: "100%"
 	width = 29%
   font = "DejaVu Sans Bold 14"
 	text_color = "#fff"
-	fg_color = "#0066FF"
+	fg_color = "#287AD4"
 	border_color = "#000"
 	bg_color = "#000"
 	text = "Your OS will be booted in %d seconds"

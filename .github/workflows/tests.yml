@@ -33,3 +33,6 @@ jobs:
 
       - name: Theme readability
         run: python tools/check_contrast.py
+
+      - name: Icons match each character's colour
+        run: python tools/recolor_icons.py --check

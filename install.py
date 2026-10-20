@@ -96,7 +96,16 @@ CHARACTER_COLORS = {
     "turbo":    BG_YELLOW,
     "vino":     BG_PURPLE,
     "wind":     BG_CYAN,
-    "yuki":     BG_WHITE
+    "yuki":     BG_WHITE,
+    "blitz":    BG_YELLOW,
+    "miku":     BG_CYAN,
+    "pinky":    BG_PINK,
+    "mona":     BG_CYAN,
+
+    # Variantes dont la couleur s'écarte de celle du personnage de base
+    "wonder_velvet":  BG_BLUE,
+    "berry_summer":   BG_BLUE,
+    "mona_starlight": BG_BLUE
 }
 
 # --- NOMS D'AFFICHAGE SPÉCIAUX ---
@@ -116,7 +125,14 @@ CHARACTER_DISPLAY_NAMES = {
     "closer_summer": "Closer (Summer)",
     "puppet_summer": "Puppet (Summer)",
     "rin_cny":       "Rin (Chinese New Year)",
-    "mont_music":    "Mont (Music)"
+    "mont_music":    "Mont (Music)",
+    "joker_starlight":   "Joker (Starlight)",
+    "mona_starlight":    "Mona (Starlight)",
+    "panther_starlight": "Panther (Starlight)",
+    "wonder_velvet":     "Wonder (Velvet Room)",
+    "wonder_shujin":     "Wonder (Shujin)",
+    "chord_summer":      "Chord (Summer)",
+    "berry_summer":      "Berry (Summer)"
 }
 
 # --- ANCIENS NOMS DE DOSSIERS ---
@@ -284,9 +300,14 @@ def check_root():
 def get_char_color(char_name, default_color):
     """Cherche la couleur spécifique du perso, sinon retourne la couleur du jeu"""
     key = char_name.lower()
+    # Le nom exact d'abord : sans ça "wonder_velvet" prendrait le rouge de
+    # "wonder" avant même d'avoir vu sa propre entrée.
+    if key in CHARACTER_COLORS:
+        return CHARACTER_COLORS[key]
+    # Sinon le préfixe, pour les variantes qui gardent la couleur du perso
+    # de base (wonder_summer, rin_cny, etc.)
     for name, color in CHARACTER_COLORS.items():
-        # Match exact ou préfixe (pour gérer wonder_summer, wonder_cny, etc.)
-        if key == name or key.startswith(name + "_"): 
+        if key.startswith(name + "_"):
             return color
     return default_color
 

@@ -63,12 +63,14 @@ GRUB stretches `desktop-image` to the screen size, so any low-resolution backgro
 
 ### 1.2 Wrong aspect ratio → stretched characters
 
-These backgrounds are ~1000×430 (close to 21:9). Stretched to 16:9, the characters are **distorted vertically**, not just blurry:
+✅ **Fixed.** Not by re-sourcing the artwork, but by telling GRUB to stop stretching it: `desktop-image-scale-method: "padding"` scales the image keeping its proportions and fills the rest with `desktop-color`, taken from the edges of the illustration so the band blends in. Applied to all themes by [`tools/fix_aspect.py`](tools/fix_aspect.py), checked by the CI, and verified by booting the themes in QEMU.
+
+These backgrounds are ~1000×430 (close to 21:9). Before the fix, stretched to 16:9, the characters were **distorted vertically**, not just blurry:
 
 `ange`, `berry`, `bui_cosmic`, `fleuret`, `key`, `luce`, `luce_notte`, `puppet_summer`, `soy_pioneer`, `turbo`, `vino`, `wonder_summer` (P5X) and `fuuka` (P3R).
 
 The 10 P5R backgrounds at 3000×1680 are sharp, but:
-- their ratio is 1.786 instead of 1.778 (slight stretch),
+- their ratio is 1.786 instead of 1.778 (no longer stretched, now a 3 px band),
 - they weigh 3–5.6 MB each, which slows down the boot.
 
 ### 1.3 P5X images come from the Chinese promo
@@ -160,24 +162,26 @@ All P5X backgrounds carry the Chinese logo and the `©[2023] Perfect World` line
 
 **Reference list:** [personadle / allOutAttackMode](https://github.com/CodeByHaamza/personadle/tree/main/allOutAttackMode) has the official All-Out Attack of 80 characters and outfits (P3, P5, P5X). Its images are 800×450 animations, too small for GRUB, but they confirm **which official AOAs exist**, and the last frame shows which art to extract in high resolution from the game.
 
-Compared with the 68 current themes, every P3 and P5 character is already in. **12 P5X themes are missing**, all with an official AOA:
+Compared with the original 68 themes, every P3 and P5 character was already in, and **12 P5X themes were missing**, all with an official AOA. **10 of them have now been added** from the official “Finishing Touch” illustrations on the [Megami Tensei Wiki](https://megamitensei.fandom.com/) — see [`SOURCES.md`](SOURCES.md). The wiki files P5X art under the character's **real name**, not their codename, which is what personadle's mapping is for.
 
 | New theme | Folder | Type |
 |---|---|---|
-| Anri (Aran Hirano) | `anri` | New Phantom Idol |
-| Pinky (Narumi Nashimoto) | `pinky` | New Phantom Idol |
-| Blitz (Kumi Katayama) | `blitz` | New Phantom Idol |
-| Miku (Hatsune Miku) | `miku` | Collaboration |
-| Joker (Starlight) | `joker_starlight` | P5 character, P5X outfit |
-| Mona (Starlight) | `mona_starlight` | P5 character, P5X outfit |
-| Panther (Starlight) | `panther_starlight` | P5 character, P5X outfit |
-| Wonder (Velvet) | `wonder_velvet` | Outfit (different from Valentine) |
-| Wonder (Shujin) | `wonder_shujin` | Outfit |
-| Closer (Radiance) | `closer_radiance` | Outfit |
-| Chord (Summer) | `chord_summer` | Outfit |
-| Berry (Summer) | `berry_summer` | Outfit |
+| Anri (Aran Hirano) | `anri` ❌ | New Phantom Idol |
+| Pinky (Narumi Nashimoto) | `pinky` ✅ | New Phantom Idol |
+| Blitz (Kumi Katayama) | `blitz` ✅ | New Phantom Idol |
+| Miku (Hatsune Miku) | `miku` ✅ | Collaboration |
+| Joker (Starlight) | `joker_starlight` ✅ | P5 character, P5X outfit |
+| Mona (Starlight) | `mona_starlight` ✅ | P5 character, P5X outfit |
+| Panther (Starlight) | `panther_starlight` ✅ | P5 character, P5X outfit |
+| Wonder (Velvet) | `wonder_velvet` ✅ | Outfit (different from Valentine) |
+| Wonder (Shujin) | `wonder_shujin` ✅ | Outfit |
+| Closer (Radiance) | `closer_radiance` ❌ | Outfit |
+| Chord (Summer) | `chord_summer` ✅ | Outfit |
+| Berry (Summer) | `berry_summer` ✅ | Outfit |
 
-The Starlight outfits come from P5X, so they go in `persona5_phantom_x/`. P5R keeps the original outfits. This brings the collection to **80 themes**.
+The Starlight outfits come from P5X, so they go in `persona5_phantom_x/`. P5R keeps the original outfits. The collection is now at **78 themes**.
+
+❌ **Anri** and **Closer (Radiance)** are still missing, and deliberately so. Anri only has promotional art on the wiki, not an All-Out Attack, and the Golden Rule forbids passing one off as the other. Closer Radiance (“Closer Sol” in English) only has a cut-out character render with no background or text. Both exist as animated captures in personadle, but at 640×360 and 800×450 with a capture ID burnt into the frame, below the quality of every theme here. See [`SOURCES.md`](SOURCES.md#known-gaps).
 
 **Official outfit names:** personadle uses the official names (checked on lufel.net). Some current folders use datamine or approximate names. They are the same outfits, checked image by image:
 
@@ -495,6 +499,10 @@ Matching themes for every step of the boot, built from the same official AOA ima
 | Installer fun | Shuffle Time, the Dark Hour, 3 animated easter eggs, Arcana, 6 languages. |
 | HD tracking | ✅ / ⏳ per theme in the gallery and an "HD artwork 20/68" badge, updated by `tools/readme_assets.py`. |
 | personadle tracking | Weekly GitHub Action opening a "[Missing theme]" issue for each official All-Out Attack without a theme. |
+| Icons | The 102 distribution icons take the colour of each theme's character instead of being red everywhere, via `tools/recolor_icons.py`. Also fixed the pack's flattened colour variants (`alma_green`, `centos_blue`… were all red) and `mx_black`, a black logo on dark red at a contrast of 1.49. Rewritten as indexed PNG: 36.6 MB → 14.3 MB. |
+| Stretched artwork | GRUB no longer stretches the illustrations: `desktop-image-scale-method: "padding"` with a `desktop-color` sampled from each artwork's edges, via `tools/fix_aspect.py`. Fixes the 14 backgrounds that are not 16:9, and any screen that is not 16:9. |
+| New themes | 10 of the 12 missing P5X themes added from the official “Finishing Touch” art on the Megami Tensei Wiki, built by `tools/new_theme.py`. Kotone Shiomi now uses her **official** P5X All-Out Attack instead of a fan-made image. |
+| Sources | [`SOURCES.md`](SOURCES.md) credits the artwork of every theme added since, and records the two characters whose AOA has no usable still. |
 | README design | Animated Persona-styled banner, quotes, game headers, dividers and calling card; showcase GIF; full gallery of the 68 themes; star history chart. All generated by `tools/readme_assets.py`, which also fills the README gallery. |
 
 ---
@@ -508,14 +516,22 @@ These items need files or actions that are not in the repository. Each one shoul
 - [ ] **Regenerate the previews**: the readability and progress bar fixes changed the colours of 61 themes, so `previews/` no longer matches the themes exactly. Re-run `prev.py` on every theme, then `python3 tools/readme_assets.py` to refresh the README thumbnails and the showcase GIF.
 - [ ] **Build pipeline**: turn the scripts into `tools/build.py` + `characters.yaml` (see [6.2](#62-charactersyaml-single-source-of-truth)).
 
+### What extracting from the games actually costs
+
+Tried, so the next person does not have to:
+
+- **P5X** — the asset bundles are **encrypted** (UnityCN). The key is not in `global-metadata.dat`, `GameAssembly.dll`, `UnityPlayer.dll` or `P5X.exe`; it is built at runtime. The one P5X-specific tool (`Asset-Studio-P5X`) is from 2023 and is reported broken on current builds. Reading the key out of the running game would mean attaching to an online Perfect World title, which risks the account. **The wiki is the practical source.**
+- **P3R** — the IoStore containers are AES-encrypted with a single default key. Scanning all 366 MB of `P3R.exe` for it found nothing, so it is assembled at runtime too. The wiki has the P3R All-Out Attack renders at up to 2048 px anyway, already cut out with transparency.
+- **P5R** — the CPK archives open fine (CRILAYLA, no encryption), but the All-Out Attack finisher is **not stored as an image**: it is a rendered 3D scene (`BATTLE/EVENT/BCD/GOODBYE/*.EPL`). What is in there is the eye cut-ins (`BATTLE/CUTIN/BCT_P_BC*.DDS`, 3840×1536) and the art gallery (`MYPALACE/GALLERY/IMG/*.DDS`, up to 4096×4096) — both official and high resolution, but neither is an All-Out Attack finisher.
+
 ### Needs the images (official All-Out Attacks only)
-- [ ] **Kotone Shiomi** (P3 female protagonist) from P5X (stays in `persona3_reload/`, see [3.3](#33-persona-3-reload)).
+- [x] **Kotone Shiomi** now uses her official P5X All-Out Attack, replacing the fan-made image ([`SOURCES.md`](SOURCES.md)). Stays in `persona3_reload/`.
 - [ ] **Fuuka** from P5X (stays in `persona3_reload/`, see [3.3](#33-persona-3-reload)).
-- [ ] **Re-source the 13 stretched themes** ([1.2](#12-wrong-aspect-ratio--stretched-characters)) with 16:9 versions of the same AOA.
+- [x] ~~**Re-source the 13 stretched themes**~~ — not needed: GRUB was told to stop stretching them instead ([1.2](#12-wrong-aspect-ratio--stretched-characters)).
 - [ ] **Re-source the low-res backgrounds** ([1.1](#11-backgrounds-below-19201080)): P5X from the Global game files, P3R `shinji` / `kotone` / `fuuka`, P5R `black_mask` / `caroline_justine` / `lavenza`.
-- [ ] **The 12 missing P5X themes** (Anri, Pinky, Blitz, Miku, Joker / Mona / Panther Starlight, Wonder Velvet / Shujin, Closer Radiance, Chord Summer, Berry Summer), extracted in high resolution from P5X ([3.1](#31-persona-5-the-phantom-x)).
+- [x] **10 of the 12 missing P5X themes** added from the wiki's official Finishing Touch art ([3.1](#31-persona-5-the-phantom-x)). Still missing: **Anri** (only promo art exists) and **Closer Radiance** (only a cut-out render) — see [`SOURCES.md`](SOURCES.md#known-gaps).
 - [ ] **Persona 4 Revival** on release, from its official AOAs ([3.4](#34-persona-4-revival-)).
-- [ ] Fill `SOURCES.md` with the source of every AOA image.
+- [x] [`SOURCES.md`](SOURCES.md) created, with the source of every theme added since. The 67 older themes still need theirs filled in as they are re-sourced.
 
 ### All-Out Attack phrases
 - [ ] Each theme shows the phrase written on its All-Out Attack after the install (`THEME_QUOTES` in `install.py`). 5 are missing because the text is cut, unreadable or absent on the current image: `mont_music`, `puppet_summer`, `rin`, `vino`, `yuki`. Add them from the HD images.

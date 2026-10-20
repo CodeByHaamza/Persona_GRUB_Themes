@@ -1,15 +1,10 @@
 # ============================================
 # SCRIPTS ET FICHIERS DE DÉVELOPPEMENT
 # ============================================
+# Les scripts de build vivent dans tools/ et sont suivis par git.
 scripts/
 test/
-prev.py
 tree.txt
-
-# Scripts de développement dans themes/
-themes/change_colors.py
-themes/copy_select_images.sh
-themes/generate_theme_txt.sh
 
 # ============================================
 # PYTHON

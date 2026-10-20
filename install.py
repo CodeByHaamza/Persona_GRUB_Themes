@@ -1,8 +1,21 @@
 #!/usr/bin/env python3
 import os
 import sys
+import glob
 import shutil
+import json
+import random
+import argparse
+import datetime
 import subprocess
+
+import install_i18n
+from install_i18n import t
+
+try:
+    import install_ui  # interface stylée (flèches, aperçus, animations)
+except ImportError:
+    install_ui = None
 
 # --- CONFIGURATION DES COULEURS (ANSI) ---
 C_RESET   = "\033[0m"
@@ -21,6 +34,8 @@ BG_GREY   = "\033[48;5;240m\033[37m"
 BG_PINK   = "\033[48;5;205m\033[37m"
 BG_BROWN  = "\033[48;5;94m\033[37m"
 BG_TEAL   = "\033[48;5;30m\033[37m" 
+BG_BLACK  = "\033[40m\033[97m"
+C_ITALIC  = "\033[3m"
 
 # --- MAPPING COULEURS PERSONNAGES ---
 CHARACTER_COLORS = {
@@ -87,32 +102,160 @@ CHARACTER_COLORS = {
 # --- NOMS D'AFFICHAGE SPÉCIAUX ---
 CHARACTER_DISPLAY_NAMES = {
     "caroline_justine": "Caroline & Justine",
-    "bui_stellar":   "Bui (Stellar)",
+    "black_mask":    "Black Mask",
+    "aigis_fes":     "Aigis (FES)",
+    "bui_cosmic":    "Bui (Cosmic)",
     "luce_notte":    "Luce (Notte)",
-    "moko_beach":    "Moko (Beach)",
-    "soy_frontiere": "Soy (Frontiere)",
+    "moko_summer":   "Moko (Summer)",
+    "soy_pioneer":   "Soy (Pioneer)",
     "wind_vast":     "Wind (Vast)",
     "wonder_cny":    "Wonder (Chinese New Year)",
-    "wonder_beach":  "Wonder (Beach)",
+    "wonder_summer": "Wonder (Summer)",
     "wonder_valentine": "Wonder (Valentine)", # AJOUTÉ ICI
-    "marian_beach":  "Marian (Beach)",
-    "closer_beach":  "Closer (Beach)",
-    "puppet_beach":  "Puppet (Beach)",
+    "marian_summer": "Marian (Summer)",
+    "closer_summer": "Closer (Summer)",
+    "puppet_summer": "Puppet (Summer)",
     "rin_cny":       "Rin (Chinese New Year)",
     "mont_music":    "Mont (Music)"
+}
+
+# --- ANCIENS NOMS DE DOSSIERS ---
+# Variantes renommées avec leur nom officiel : les anciens noms marchent toujours
+# avec --theme, et --uninstall retire aussi les thèmes installés sous l'ancien nom
+RENAMED_THEMES = {
+    "bui_stellar":   "bui_cosmic",
+    "soy_frontiere": "soy_pioneer",
+    "wonder_beach":  "wonder_summer",
+    "closer_beach":  "closer_summer",
+    "moko_beach":    "moko_summer",
+    "marian_beach":  "marian_summer",
+    "puppet_beach":  "puppet_summer",
 }
 
 # Chemins
 PWD = os.path.dirname(os.path.realpath(__file__))
 THEMES_DIR = os.path.join(PWD, "themes")
-GRUB_THEMES_TARGET = "/boot/grub/themes"
 GRUB_CONFIG_FILE = "/etc/default/grub"
+# Copie de la config d'origine, faite une seule fois et jamais écrasée
+GRUB_CONFIG_ORIGINAL = GRUB_CONFIG_FILE + ".persona.orig"
+DRM_DIR = "/sys/class/drm"
+EFI_DIR = "/sys/firmware/efi"
+SHARED_DIR = os.path.join(THEMES_DIR, "_shared")
+
+# Entrée "Velvet Room" : ouvre les réglages UEFI (commande GRUB fwsetup)
+VELVET_ROOM_SCRIPT = "/etc/grub.d/42_persona_velvet_room"
+VELVET_ROOM_ICON = os.path.join(SHARED_DIR, "icons", "velvet.png")
+VELVET_ROOM_CONTENT = """#!/bin/sh
+# Added by Persona GRUB Themes (install.py --velvet-room). Remove with install.py --uninstall.
+cat << 'EOF'
+if [ "$grub_platform" = "efi" ]; then
+  menuentry 'Velvet Room (UEFI Firmware Settings)' --class velvet --id persona-velvet-room {
+    fwsetup
+  }
+fi
+EOF
+"""
+
+# Arcane de chaque personnage, reprise de la base de personadle (database/characters_clean.js).
+# Pas d'entrée = pas d'Arcane dans personadle (persos de P5X, Metis) : on n'invente rien.
+THEME_ARCANA = {
+    "makoto": "Fool", "kotone": "Fool", "junpei": "Magician", "yukari": "Lovers", "fuuka": "Priestess",
+    "mitsuru": "Empress", "akihiko": "Star", "aigis": "Aeon", "aigis_fes": "Aeon", "ken": "Justice",
+    "koromaru": "Strength", "shinji": "Moon",
+    "joker": "Fool", "morgana": "Magician", "skull": "Chariot", "panther": "Lovers", "fox": "Emperor",
+    "queen": "Priestess", "oracle": "Hermit", "noir": "Empress", "crow": "Justice", "black_mask": "Justice",
+    "violet": "Faith", "caroline_justine": "Strength", "lavenza": "Strength",
+}
+
+# Une réplique par jeu, quand le thème n'a pas de phrase (voir THEME_QUOTES)
+GAME_QUOTES = {
+    "persona5_royal": "Looking cool, Joker!",
+    "persona5_phantom_x": "Take your heart.",
+    "persona3_reload": "Memento mori.",
+}
+
+# La phrase écrite sur l'All-Out Attack officiel de chaque thème, recopiée telle quelle
+# (pas d'entrée = texte illisible ou absent de l'image actuelle : à compléter avec les images HD)
+THEME_QUOTES = {
+    # --- Persona 3 Reload ---
+    "aigis":            "TARGET NEUTRALIZED.",
+    "aigis_fes":        "TARGET NEUTRALIZED.",
+    "akihiko":          "ON TO THE NEXT BOUT.",
+    "fuuka":            "I'LL BE YOUR SUPPORT.",
+    "junpei":           "THAT'S THE GAME!",
+    "ken":              "DON'T LOOK DOWN ON ME.",
+    "koromaru":         "WOOF! WOOF! WOOF!",
+    "kotone":           "PERFECTLY ACCOMPLISHED!!",
+    "makoto":           "DONE AND DUSTED.",
+    "metis":            "ANYTHING FOR HER.",
+    "mitsuru":          "KNEEL BEFORE ME.",
+    "shinji":           "DON'T WASTE YOUR BREATH.",
+    "yukari":           "THERE YOU HAVE IT",
+
+    # --- Persona 5 Royal ---
+    "joker":            "THE SHOW'S OVER",
+    "skull":            "FREAKIN' BORING!",
+    "panther":          "OMG!! We are SO awesome",
+    "morgana":          "MISSION ACCOMPLISHED",
+    "fox":              "IT WAS FUN WHILE IT LASTED. GOODBYE",
+    "queen":            "JUSTICE HAS PREVAILED.",
+    "oracle":           "Git Gud",
+    "noir":             "Adieu.",
+    "crow":             "My sole interest is uncovering the truth.",
+    "violet":           "Beauty is Devotion",
+    "black_mask":       "I DECIDE THE TRUTH",
+    "caroline_justine": "Don't be so cocky",
+    "lavenza":          "Don't be naïve",
+
+    # --- Persona 5: The Phantom X ---
+    "wonder":           "GO BEYOND",
+    "wonder_summer":    "GO BEYOND",
+    "wonder_cny":       "Wish you a bountiful year",
+    "wonder_valentine": "Happy Valentine",
+    "ange":             "Et Misericordia",
+    "berry":            "I'll cute-ly destroy your eardrums.",
+    "bui":              "GAME OVER",
+    "bui_cosmic":       "ONE MORE GAME",
+    "cattle":           "WE SEE YOU.",
+    "cherish":          "Be true to my friend",
+    "chord":            "LIVING FOR TODAY",
+    "closer":           "It's cool!!!",
+    "closer_summer":    "Summer Sizzle Slam",
+    "fleuret":          "Êtes-vous prêts",
+    "howler":           "WELCOME SHIBUYA",
+    "key":              "Exorcizamus te",
+    "leon":             "HERO ON STAGE",
+    "luce":             "Or che mi conoscete",
+    "luce_notte":       "Chi trova un amico trova un tesoro",
+    "marian":           "Sterilization Completed",
+    "marian_summer":    "Heal your wounds.",
+    "matoi":            "I Fight What You Fear",
+    "messa":            "Now, you are free",
+    "moko":             "Shoot for the Moon",
+    "moko_summer":      "MAKING WAVES THIS SUMMER!",
+    "mont":             "Take over the previous self",
+    "okyann":           "GIRL POWER!",
+    "phoebe":           "Cheers to your soul!",
+    "puppet":           "Shattered Dreams",
+    "riddle":           "I AM CURIOUS!",
+    "rin_cny":          "恭喜發財",
+    "sepia":            "To thine own self be true.",
+    "soy":              "WOULD YOU LIKE SOME MORE?",
+    "soy_pioneer":      "YOU'VE GIVEN ME A TASTE FOR LIFE",
+    "turbo":            "Dream of Velocity",
+    "wind":             "Wish you well",
+    "wind_vast":        "One Day One Life",
+}
+
+# Mode simulation (--dry-run) : rien n'est écrit
+DRY_RUN = False
 
 # Noms d'affichage des jeux
 GAME_NAMES = {
     "persona5_royal": "Persona 5 Royal",
     "persona5_phantom_x": "Persona 5: The Phantom X",
-    "persona3_reload": "Persona 3 Reload"
+    "persona3_reload": "Persona 3 Reload",
+    "persona4_revival": "Persona 4 Revival"
 }
 
 def clear_screen():
@@ -120,6 +263,17 @@ def clear_screen():
 
 def print_header(title, color=BG_RED):
     print(f"\n{color}  {title}  {C_RESET}\n")
+
+def print_ransom(text):
+    """Titre en lettres découpées, façon carte de visite des Phantom Thieves"""
+    styles = [BG_RED, BG_WHITE, BG_BLACK, BG_WHITE, BG_RED, BG_BLACK]
+    letters = [f"{styles[i % len(styles)]}{C_BOLD} {c} {C_RESET}" if c != " " else "  " for i, c in enumerate(text)]
+    print("\n  " + "".join(letters))
+
+def print_welcome():
+    print_ransom("PERSONA")
+    print(f"  {BG_BLACK}{C_BOLD} GRUB THEMES {C_RESET}{BG_RED}  {C_RESET}")
+    print(f"\n  {C_ITALIC}Welcome to the Velvet Room.{C_RESET}\n")
 
 def check_root():
     if os.geteuid() != 0:
@@ -131,7 +285,7 @@ def get_char_color(char_name, default_color):
     """Cherche la couleur spécifique du perso, sinon retourne la couleur du jeu"""
     key = char_name.lower()
     for name, color in CHARACTER_COLORS.items():
-        # Match exact ou préfixe (pour gérer wonder_beach, wonder_cny, etc.)
+        # Match exact ou préfixe (pour gérer wonder_summer, wonder_cny, etc.)
         if key == name or key.startswith(name + "_"): 
             return color
     return default_color
@@ -224,66 +378,356 @@ def select_from_dict(options, prompt_text, default_color=BG_RED, use_char_colors
                 return keys[idx]
         except ValueError:
             pass
-        print("Invalid selection.")
+        print(t("invalid"))
 
-def update_grub_config(theme_path):
-    print(f"Updating {GRUB_CONFIG_FILE}...")
-    shutil.copyfile(GRUB_CONFIG_FILE, f"{GRUB_CONFIG_FILE}.bak")
-    
-    with open(GRUB_CONFIG_FILE, 'r') as f:
-        lines = f.readlines()
-    
-    new_lines = []
-    theme_set = False
-    
-    for line in lines:
-        if line.strip().startswith("GRUB_THEME="):
-            new_lines.append(f'GRUB_THEME="{theme_path}/theme.txt"\n')
-            theme_set = True
-        elif line.strip().startswith("GRUB_TERMINAL_OUTPUT=") or line.strip().startswith("#GRUB_TERMINAL_OUTPUT="):
-            new_lines.append('#GRUB_TERMINAL_OUTPUT="console"\n')
-        else:
-            new_lines.append(line)
-            
-    if not theme_set:
-        new_lines.append(f'GRUB_THEME="{theme_path}/theme.txt"\n')
-        
+# --- DÉTECTION DE GRUB ---
+def detect_grub():
+    """Retourne (dossier GRUB, commande de mise à jour) selon la distribution.
+    Debian/Ubuntu/Arch : /boot/grub — Fedora/openSUSE/RHEL : /boot/grub2"""
+    if os.path.isdir("/boot/grub2") and not os.path.isdir("/boot/grub"):
+        grub_dir = "/boot/grub2"
+    elif os.path.isfile("/boot/grub2/grub.cfg") and not os.path.isfile("/boot/grub/grub.cfg"):
+        grub_dir = "/boot/grub2"
+    else:
+        grub_dir = "/boot/grub"
+
+    cfg = os.path.join(grub_dir, "grub.cfg")
+    if shutil.which("update-grub"):
+        cmd = ["update-grub"]
+    elif shutil.which("grub2-mkconfig"):
+        cmd = ["grub2-mkconfig", "-o", cfg]
+    elif shutil.which("grub-mkconfig"):
+        cmd = ["grub-mkconfig", "-o", cfg]
+    else:
+        cmd = None
+    return grub_dir, cmd
+
+def detect_resolution():
+    """Résolution native du premier écran branché (ex: '1920x1080'), sinon None"""
+    for status_file in sorted(glob.glob(os.path.join(DRM_DIR, "card*-*", "status"))):
+        try:
+            with open(status_file) as f:
+                if f.read().strip() != "connected":
+                    continue
+            with open(os.path.join(os.path.dirname(status_file), "modes")) as f:
+                mode = f.readline().strip()
+            if mode:
+                return mode
+        except OSError:
+            continue
+    return None
+
+# --- CONFIGURATION ---
+def backup_grub_config():
+    """Garde la config d'origine une seule fois, puis une sauvegarde horodatée à chaque modif"""
+    if DRY_RUN:
+        return
+    if not os.path.exists(GRUB_CONFIG_ORIGINAL):
+        shutil.copyfile(GRUB_CONFIG_FILE, GRUB_CONFIG_ORIGINAL)
+        print(f"Original config saved to {GRUB_CONFIG_ORIGINAL}")
+    stamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    shutil.copyfile(GRUB_CONFIG_FILE, f"{GRUB_CONFIG_FILE}.bak.{stamp}")
+
+def write_grub_config(lines, new_lines):
+    if new_lines == lines:
+        print(f"{GRUB_CONFIG_FILE} is already up to date.")
+        return
+    if DRY_RUN:
+        print(f"{BG_YELLOW} DRY RUN {C_RESET} Changes that would be made to {GRUB_CONFIG_FILE}:")
+        for line in lines:
+            if line not in new_lines:
+                print(f"  - {line.rstrip()}")
+        for line in new_lines:
+            if line not in lines:
+                print(f"  + {line.rstrip()}")
+        return
+    backup_grub_config()
     with open(GRUB_CONFIG_FILE, 'w') as f:
         f.writelines(new_lines)
 
-def update_grub_binary():
-    print_header("Updating GRUB Binary...", BG_BLUE)
-    cmd = None
-    if shutil.which("update-grub"):
-        cmd = ["update-grub"]
-    elif shutil.which("grub-mkconfig"):
-        cmd = ["grub-mkconfig", "-o", "/boot/grub/grub.cfg"]
-    
-    if cmd:
-        try:
-            subprocess.run(cmd, check=True)
-            print(f"\n{BG_GREEN} SUCCESS {C_RESET} GRUB has been updated successfully!")
-        except subprocess.CalledProcessError:
-            print(f"\n{BG_RED} ERROR {C_RESET} Failed to update GRUB.")
-    else:
-        print(f"{BG_RED} WARNING {C_RESET} Could not find 'update-grub' or 'grub-mkconfig'.")
+def config_value(line):
+    return line.split("=", 1)[1].strip().strip('"').strip("'")
 
-def main():
-    clear_screen()
-    check_root()
-    
-    print_header("PERSONA GRUB THEME INSTALLER")
-    data = scan_themes()
-    
-    if not data:
-        print("No themes found.")
+def update_grub_config(theme_path, gfxmode=None):
+    print(f"Updating {GRUB_CONFIG_FILE}...")
+    with open(GRUB_CONFIG_FILE, 'r') as f:
+        lines = f.readlines()
+
+    new_lines = []
+    theme_set = False
+    gfxmode_set = False
+
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("GRUB_THEME="):
+            new_lines.append(f'GRUB_THEME="{theme_path}/theme.txt"\n')
+            theme_set = True
+        # Un terminal "console" désactive le thème graphique
+        elif stripped.startswith("GRUB_TERMINAL_OUTPUT=") and "console" in config_value(stripped):
+            new_lines.append("#" + line)
+        elif stripped.startswith("GRUB_TERMINAL=") and config_value(stripped) == "console":
+            new_lines.append("#" + line)
+        else:
+            if stripped.startswith("GRUB_GFXMODE="):
+                gfxmode_set = True
+            new_lines.append(line)
+
+    if new_lines and not new_lines[-1].endswith("\n"):
+        new_lines[-1] += "\n"
+    if not theme_set:
+        new_lines.append(f'GRUB_THEME="{theme_path}/theme.txt"\n')
+    # On ne touche pas à une résolution déjà choisie par l'utilisateur
+    if not gfxmode_set:
+        mode = f"{gfxmode},auto" if gfxmode else "auto"
+        new_lines.append(f'GRUB_GFXMODE="{mode}"\n')
+
+    write_grub_config(lines, new_lines)
+
+def remove_theme_from_config():
+    with open(GRUB_CONFIG_FILE, 'r') as f:
+        lines = f.readlines()
+    new_lines = ["#" + line if line.strip().startswith("GRUB_THEME=") else line for line in lines]
+    write_grub_config(lines, new_lines)
+
+def update_grub_binary(cmd):
+    print_header("Updating GRUB Binary...", BG_BLUE)
+    if not cmd:
+        print(f"{BG_RED} WARNING {C_RESET} Could not find 'update-grub', 'grub-mkconfig' or 'grub2-mkconfig'.")
+        return False
+    if DRY_RUN:
+        print(f"{BG_YELLOW} DRY RUN {C_RESET} Would run: {' '.join(cmd)}")
+        return True
+    try:
+        subprocess.run(cmd, check=True)
+        print(f"\n{BG_GREEN} SUCCESS {C_RESET} GRUB has been updated successfully!")
+        return True
+    except subprocess.CalledProcessError:
+        print(f"\n{BG_RED} ERROR {C_RESET} Failed to update GRUB.")
+        return False
+
+# --- VELVET ROOM ---
+def is_uefi():
+    return os.path.isdir(EFI_DIR)
+
+def install_velvet_room():
+    if DRY_RUN:
+        print(f"{BG_YELLOW} DRY RUN {C_RESET} Would add the Velvet Room entry ({VELVET_ROOM_SCRIPT})")
+        return
+    with open(VELVET_ROOM_SCRIPT, "w") as f:
+        f.write(VELVET_ROOM_CONTENT)
+    os.chmod(VELVET_ROOM_SCRIPT, 0o755)
+    print(f"Added the Velvet Room entry ({VELVET_ROOM_SCRIPT})")
+
+def remove_velvet_room():
+    if not os.path.exists(VELVET_ROOM_SCRIPT):
+        return
+    if DRY_RUN:
+        print(f"{BG_YELLOW} DRY RUN {C_RESET} Would remove {VELVET_ROOM_SCRIPT}")
+        return
+    os.remove(VELVET_ROOM_SCRIPT)
+    print(f"Removed the Velvet Room entry ({VELVET_ROOM_SCRIPT})")
+
+# --- ACTIONS ---
+def install_theme(source_path, grub_dir, cmd, velvet_room=False):
+    themes_target = os.path.join(grub_dir, "themes")
+    target_path = os.path.join(themes_target, os.path.basename(source_path))
+
+    if DRY_RUN:
+        print(f"{BG_YELLOW} DRY RUN {C_RESET} Would copy {source_path} -> {target_path}")
+    else:
+        os.makedirs(themes_target, exist_ok=True)
+        print(f"Copying files to {target_path}...")
+        if os.path.exists(target_path):
+            shutil.rmtree(target_path)
+        shutil.copytree(source_path, target_path)
+
+    if velvet_room:
+        install_velvet_room()
+    # L'icône de l'entrée Velvet Room doit être dans le thème installé
+    if (velvet_room or os.path.exists(VELVET_ROOM_SCRIPT)) and not DRY_RUN:
+        shutil.copyfile(VELVET_ROOM_ICON, os.path.join(target_path, "icons", "velvet.png"))
+
+    resolution = detect_resolution()
+    if resolution:
+        print(f"Detected screen resolution: {resolution}")
+    update_grub_config(target_path, resolution)
+    return update_grub_binary(cmd)
+
+def uninstall_themes(grub_dir, cmd):
+    """Retire GRUB_THEME de la config et supprime les thèmes Persona installés"""
+    print_header("Uninstall", BG_RED)
+    themes_target = os.path.join(grub_dir, "themes")
+    ours = {name for name in os.listdir(THEMES_DIR) if not name.startswith("_")}
+    ours = {theme for game in ours if os.path.isdir(os.path.join(THEMES_DIR, game))
+            for theme in os.listdir(os.path.join(THEMES_DIR, game))}
+    ours |= set(RENAMED_THEMES)
+
+    installed = []
+    if os.path.isdir(themes_target):
+        installed = sorted(t for t in os.listdir(themes_target) if t in ours)
+    for theme in installed:
+        path = os.path.join(themes_target, theme)
+        if DRY_RUN:
+            print(f"{BG_YELLOW} DRY RUN {C_RESET} Would remove {path}")
+        else:
+            print(f"Removing {path}")
+            shutil.rmtree(path)
+    if not installed:
+        print("No Persona theme found in " + themes_target)
+
+    remove_velvet_room()
+    remove_theme_from_config()
+    update_grub_binary(cmd)
+
+def restore_config(cmd):
+    """Remet la config GRUB telle qu'elle était avant la toute première installation"""
+    print_header("Restore", BG_BLUE)
+    if not os.path.exists(GRUB_CONFIG_ORIGINAL):
+        print(f"{BG_RED} ERROR {C_RESET} No original backup found ({GRUB_CONFIG_ORIGINAL}).")
+        return
+    if DRY_RUN:
+        print(f"{BG_YELLOW} DRY RUN {C_RESET} Would restore {GRUB_CONFIG_ORIGINAL} -> {GRUB_CONFIG_FILE}")
+    else:
+        backup_grub_config()
+        shutil.copyfile(GRUB_CONFIG_ORIGINAL, GRUB_CONFIG_FILE)
+        print(f"Restored {GRUB_CONFIG_FILE} from {GRUB_CONFIG_ORIGINAL}")
+    remove_velvet_room()
+    update_grub_binary(cmd)
+
+# --- VENTOY ---
+def install_ventoy(source_path, mountpoint):
+    """Copie le thème sur une clé Ventoy et le déclare dans ventoy/ventoy.json"""
+    print_header("Ventoy", BG_BLUE)
+    if not os.path.isdir(mountpoint):
+        print(f"{BG_RED} ERROR {C_RESET} {mountpoint} is not a directory. Give the mount point of the Ventoy USB drive.")
+        sys.exit(1)
+
+    folder = os.path.basename(source_path)
+    ventoy_dir = os.path.join(mountpoint, "ventoy")
+    target_path = os.path.join(ventoy_dir, "themes", folder)
+    json_path = os.path.join(ventoy_dir, "ventoy.json")
+
+    config = {}
+    if os.path.exists(json_path):
+        try:
+            with open(json_path) as f:
+                config = json.load(f)
+        except ValueError:
+            print(f"{BG_RED} ERROR {C_RESET} {json_path} is not valid JSON. Fix it first, nothing was changed.")
+            sys.exit(1)
+    # On ne remplace que le réglage du thème, le reste de ventoy.json est gardé
+    config["theme"] = {
+        "file": f"/ventoy/themes/{folder}/theme.txt",
+        "gfxmode": detect_resolution() or "1920x1080",
+    }
+
+    if DRY_RUN:
+        print(f"{BG_YELLOW} DRY RUN {C_RESET} Would copy {source_path} -> {target_path}")
+        print(f"{BG_YELLOW} DRY RUN {C_RESET} Would write to {json_path}:")
+        print(json.dumps({"theme": config["theme"]}, indent=2))
         return
 
+    if os.path.exists(target_path):
+        shutil.rmtree(target_path)
+    shutil.copytree(source_path, target_path)
+    print(f"Copied the theme to {target_path}")
+
+    if os.path.exists(json_path):
+        stamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        shutil.copyfile(json_path, f"{json_path}.bak.{stamp}")
+    with open(json_path, "w") as f:
+        json.dump(config, f, indent=2)
+        f.write("\n")
+    print(f"Updated {json_path}")
+    print(f"\n{BG_GREEN} SUCCESS {C_RESET} Boot from the USB drive to see the theme in Ventoy.")
+
+def list_themes(data):
+    for game in sorted(data.keys()):
+        print_header(GAME_NAMES.get(game, game), BG_BLUE if "persona3" in game else BG_RED)
+        for char in sorted(data[game].keys()):
+            for variant, path in data[game][char].items():
+                label = char if variant == "Default" else f"{char} ({variant})"
+                print(f"  {os.path.basename(path):20} {label}")
+
+def find_theme(data, name):
+    """Trouve un thème par nom de dossier ('joker') ou 'jeu/dossier' ('persona5_royal/joker')"""
+    game_prefix, _, folder_name = name.rpartition("/")
+    if folder_name in RENAMED_THEMES:
+        name = f"{game_prefix}/{RENAMED_THEMES[folder_name]}" if game_prefix else RENAMED_THEMES[folder_name]
+    matches = []
+    for game, characters in data.items():
+        for variants in characters.values():
+            for path in variants.values():
+                folder = os.path.basename(path)
+                if name in (folder, f"{game}/{folder}"):
+                    matches.append(path)
+    return matches
+
+def fancy_ui(args):
+    return install_ui is not None and not args.plain and install_ui.available()
+
+def print_quote(theme_path, theme_name, fancy=False):
+    """La phrase de l'All-Out Attack du thème installé, sinon une réplique du jeu"""
+    folder = os.path.basename(theme_path)
+    if fancy:
+        game = os.path.basename(os.path.dirname(theme_path))
+        install_ui.outro(THEME_QUOTES.get(folder) or GAME_QUOTES.get(game), theme_name if folder in THEME_QUOTES else "", game)
+        return
+    if folder in THEME_QUOTES:
+        print(f"\n  {C_ITALIC}{C_BOLD}“{THEME_QUOTES[folder]}”{C_RESET} — {theme_name}")
+    else:
+        game = os.path.basename(os.path.dirname(theme_path))
+        print(f"\n  {C_ITALIC}{C_BOLD}{GAME_QUOTES.get(game, 'Enjoy your Persona GRUB Theme!')}{C_RESET}")
+
+def shuffle_pick(data):
+    """Shuffle Time sans l'interface stylée : un thème au hasard"""
+    paths = [path for characters in data.values() for variants in characters.values() for path in variants.values()]
+    path = random.choice(paths)
+    print(f"\n{BG_BLUE} SHUFFLE TIME {C_RESET} {C_BOLD}{get_display_name(os.path.basename(path))}{C_RESET}")
+    return path
+
+def select_theme_by_name(data, name):
+    matches = find_theme(data, name)
+    if len(matches) != 1:
+        reason = "is ambiguous" if matches else "was not found"
+        print(f"{BG_RED} ERROR {C_RESET} Theme '{name}' {reason}. Use --list to see available themes.")
+        sys.exit(1)
+    return matches[0]
+
+def ask_reboot():
+    reboot = input(f"\n{C_BOLD}{t('reboot_question')}{C_RESET}")
+    if install_i18n.is_yes(reboot):
+        print(t("rebooting"))
+        subprocess.run(["reboot"])
+    else:
+        print(t("reboot_later"))
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Persona GRUB Theme Installer")
+    parser.add_argument("--theme", metavar="NAME",
+                        help="install a theme without the menu (folder name, e.g. 'joker' or 'persona5_royal/joker')")
+    parser.add_argument("--list", action="store_true", help="list available themes")
+    parser.add_argument("--uninstall", action="store_true", help="remove installed Persona themes and the GRUB_THEME line")
+    parser.add_argument("--restore", action="store_true", help="restore /etc/default/grub as it was before the first install")
+    parser.add_argument("--velvet-room", action="store_true",
+                        help="add a 'Velvet Room' entry that opens the UEFI firmware settings")
+    parser.add_argument("--ventoy", metavar="MOUNTPOINT",
+                        help="install the theme on a Ventoy USB drive instead of the system GRUB")
+    parser.add_argument("--plain", action="store_true", help="use the simple numbered menus")
+    parser.add_argument("--lang", choices=install_i18n.available(),
+                        help="language of the installer (default: the system language)")
+    parser.add_argument("--shuffle-time", action="store_true", help="let fate pick a random theme")
+    parser.add_argument("--dry-run", action="store_true", help="show what would change without touching anything")
+    parser.add_argument("-y", "--yes", action="store_true", help="do not ask for confirmation or reboot")
+    return parser.parse_args()
+
+def interactive_select(data):
+    """Menus jeu -> personnage -> variante. Retourne (chemin, nom, variante ou None, couleur)"""
     # 1. Sélection du JEU
-    print(f"{C_BOLD}Select your Game:{C_RESET}")
+    print(f"{C_BOLD}{t('select_game')}{C_RESET}")
     sorted_games = {k: data[k] for k in sorted(data.keys())} 
     display_games = {GAME_NAMES.get(k, k): k for k in sorted_games.keys()}
-    selected_game_display = select_from_dict(display_games, "Choose a game", BG_RED)
+    selected_game_display = select_from_dict(display_games, t("prompt_game"), BG_RED)
     selected_game_key = display_games[selected_game_display]
     
     game_default_color = BG_BLUE if "persona3" in selected_game_key else BG_RED
@@ -291,11 +735,11 @@ def main():
     # 2. Sélection du PERSONNAGE
     clear_screen()
     print_header(selected_game_display, game_default_color)
-    print(f"{C_BOLD}Select a Character:{C_RESET}")
+    print(f"{C_BOLD}{t('select_character')}{C_RESET}")
     
     characters = data[selected_game_key]
     characters = {k: characters[k] for k in sorted(characters.keys())}
-    selected_char_key = select_from_dict(characters, "Choose a character", game_default_color, use_char_colors=True)
+    selected_char_key = select_from_dict(characters, t("prompt_character"), game_default_color, use_char_colors=True)
     
     char_key_simple = selected_char_key.split(' ')[0].lower()
     if "caroline" in char_key_simple: char_key_simple = "caroline"
@@ -303,56 +747,118 @@ def main():
 
     # 3. Sélection de la VARIANTE
     variants = characters[selected_char_key]
-    final_path = ""
     
     if len(variants) == 1:
-        final_path = list(variants.values())[0]
-    else:
-        clear_screen()
-        print_header(f"{selected_char_key} Styles", char_color)
-        print(f"{C_BOLD}Select a Style:{C_RESET}")
-        selected_variant_key = select_from_dict(variants, "Choose a style", char_color)
-        final_path = variants[selected_variant_key]
+        return list(variants.values())[0], selected_char_key, None, char_color
 
-    # --- INSTALLATION ---
-    folder_name = os.path.basename(final_path)
-    target_path = os.path.join(GRUB_THEMES_TARGET, folder_name)
-    
     clear_screen()
-    print_header("Installation", char_color)
-    print(f"Theme: {C_BOLD}{selected_char_key}{C_RESET}")
-    if len(variants) > 1:
-        print(f"Style: {C_BOLD}{selected_variant_key}{C_RESET}")
-        
-    print(f"Target: {target_path}")
-    print("-" * 30)
-    
-    confirm = input("Proceed with installation? [Y/n]: ")
-    if confirm.lower() in ["n", "no"]:
-        print("Aborted.")
+    print_header(t("styles_of", name=selected_char_key), char_color)
+    print(f"{C_BOLD}{t('select_style')}{C_RESET}")
+    selected_variant_key = select_from_dict(variants, t("prompt_style"), char_color)
+    return variants[selected_variant_key], selected_char_key, selected_variant_key, char_color
+
+def main():
+    global DRY_RUN
+    args = parse_args()
+    DRY_RUN = args.dry_run
+    if args.lang:
+        install_i18n.set_language(args.lang)
+
+    data = scan_themes()
+    if not data:
+        print("No themes found.")
         return
 
-    if not os.path.exists(GRUB_THEMES_TARGET):
-        os.makedirs(GRUB_THEMES_TARGET)
-        
-    print(f"Copying files to {target_path}...")
-    if os.path.exists(target_path):
-        shutil.rmtree(target_path)
-    shutil.copytree(final_path, target_path)
-    
-    update_grub_config(target_path)
-    update_grub_binary()
-    
-    print("\nEnjoy your Persona GRUB Theme! :)")
-    print(f"\n{BG_GREEN} SUCCESS {C_RESET} Installation complete!")
-    print("You need to reboot to see the changes.")
-    
-    reboot = input(f"\n{C_BOLD}Do you want to reboot now? [y/N]: {C_RESET}")
-    if reboot.lower() in ["y", "yes"]:
-        print("Rebooting...")
-        os.system("reboot")
+    if args.list:
+        list_themes(data)
+        return
+
+    if args.ventoy:
+        if args.theme:
+            final_path = select_theme_by_name(data, args.theme)
+        elif args.shuffle_time and not fancy_ui(args):
+            final_path = shuffle_pick(data)
+        elif fancy_ui(args):
+            result = install_ui.run(data, THEME_QUOTES, False, THEME_ARCANA, args.shuffle_time)
+            if result is None:
+                print(f"{C_ITALIC}{t('take_your_time')}{C_RESET}")
+                return
+            final_path = result[0]
+        else:
+            clear_screen()
+            print_welcome()
+            final_path = interactive_select(data)[0]
+        install_ventoy(final_path, args.ventoy)
+        return
+
+    if not DRY_RUN:
+        check_root()
+    if not os.path.isfile(GRUB_CONFIG_FILE):
+        print(f"{BG_RED} ERROR {C_RESET} {GRUB_CONFIG_FILE} not found. Is GRUB installed?")
+        sys.exit(1)
+    grub_dir, cmd = detect_grub()
+
+    if args.restore:
+        restore_config(cmd)
+        return
+    if args.uninstall:
+        uninstall_themes(grub_dir, cmd)
+        return
+
+    fancy = False
+    velvet_room = args.velvet_room
+    if args.theme:
+        final_path = select_theme_by_name(data, args.theme)
+        theme_name, variant_name, char_color = get_display_name(os.path.basename(final_path)), None, BG_RED
+    elif args.shuffle_time and not fancy_ui(args):
+        final_path = shuffle_pick(data)
+        theme_name, variant_name, char_color = get_display_name(os.path.basename(final_path)), None, BG_RED
+    elif fancy_ui(args):
+        velvet_available = is_uefi() and not os.path.exists(VELVET_ROOM_SCRIPT)
+        result = install_ui.run(data, THEME_QUOTES, velvet_available, THEME_ARCANA, args.shuffle_time)
+        if result is None:
+            print(f"{C_ITALIC}{t('take_your_time')}{C_RESET}")
+            return
+        final_path, theme_name, variant_name, velvet_choice = result
+        velvet_room = velvet_room or velvet_choice
+        char_color = get_char_color(theme_name.split(" ")[0].lower(), BG_RED)
+        fancy = True
     else:
-        print("Okay. Don't forget to reboot later!")
+        clear_screen()
+        print_welcome()
+        final_path, theme_name, variant_name, char_color = interactive_select(data)
+        clear_screen()
+
+    # --- INSTALLATION ---
+    print_header(t("install_header"), char_color)
+    print(f"{t('theme')}: {C_BOLD}{theme_name}{C_RESET}")
+    if variant_name:
+        print(f"{t('style')}: {C_BOLD}{variant_name}{C_RESET}")
+    print(f"{t('target')}: {os.path.join(grub_dir, 'themes', os.path.basename(final_path))}")
+    print("-" * 30)
+    
+    if not args.yes and not fancy:  # l'interface stylée a déjà demandé confirmation
+        confirm = input(t("proceed"))
+        if confirm.strip() and not install_i18n.is_yes(confirm):
+            print(f"{t('aborted')} {C_ITALIC}{t('take_your_time')}{C_RESET}")
+            return
+        if not velvet_room and is_uefi() and not os.path.exists(VELVET_ROOM_SCRIPT):
+            velvet_room = install_i18n.is_yes(input(t("velvet_question")))
+
+    if not install_theme(final_path, grub_dir, cmd, velvet_room):
+        sys.exit(1)
+
+    if DRY_RUN:
+        print(f"\n{BG_YELLOW} DRY RUN {C_RESET} Nothing was changed.")
+        return
+
+    print_quote(final_path, theme_name, fancy)
+    print(f"\n{BG_GREEN} SUCCESS {C_RESET} {t('success')}")
+    print(t("reboot_needed"))
+    print(t("undo"))
+
+    if not args.yes:
+        ask_reboot()
 
 if __name__ == "__main__": # Ne touche pas à ça
     main()

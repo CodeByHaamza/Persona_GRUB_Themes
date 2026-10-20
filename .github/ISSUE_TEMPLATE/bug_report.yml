@@ -1,0 +1,55 @@
+name: 🐛 Bug report
+description: The theme or the installer does not work as expected
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: input
+    id: theme
+    attributes:
+      label: Theme
+      placeholder: "e.g. persona5_royal/joker"
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you expected, what you got. Screenshots / photos of the boot screen help a lot.
+    validations:
+      required: true
+  - type: input
+    id: distro
+    attributes:
+      label: Distribution and version
+      placeholder: "e.g. Fedora 41, Ubuntu 24.04, Arch"
+    validations:
+      required: true
+  - type: input
+    id: grub
+    attributes:
+      label: GRUB version
+      description: "Output of `grub-install --version` or `grub2-install --version`"
+  - type: dropdown
+    id: firmware
+    attributes:
+      label: Firmware
+      options:
+        - UEFI
+        - UEFI with Secure Boot
+        - Legacy BIOS
+        - I don't know
+  - type: input
+    id: resolution
+    attributes:
+      label: Screen resolution
+      placeholder: "e.g. 1920x1080"
+  - type: textarea
+    id: config
+    attributes:
+      label: /etc/default/grub
+      description: "Output of `grep -v '^#' /etc/default/grub`"
+      render: shell
+  - type: textarea
+    id: installer
+    attributes:
+      label: Installer output
+      description: "If you used install.py, paste its output (you can re-run it with --dry-run)"
+      render: shell

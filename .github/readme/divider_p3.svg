@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="22" viewBox="0 0 1280 22"><style>
+.wave{animation:wave 9s linear infinite}
+.wave2{animation:wave 14s linear infinite reverse}
+@keyframes wave{to{transform:translateX(-400px)}}
+.moon{animation:moon 5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes moon{0%,100%{opacity:.85;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
+.rise{animation:rise 1.1s cubic-bezier(.2,.9,.2,1) both}
+@keyframes rise{0%{transform:translateY(30px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}</style><defs></defs><g class="wave"><path d="M0 11 q40.0 -7 80.0 0 t80.0 0 q40.0 -7 80.0 0 t80.0 0 q40.0 -7 80.0 0 t80.0 0 q40.0 -7 80.0 0 t80.0 0 q40.0 -7 80.0 0 t80.0 0 q40.0 -7 80.0 0 t80.0 0 q40.0 -7 80.0 0 t80.0 0 q40.0 -7 80.0 0 t80.0 0 q40.0 -7 80.0 0 t80.0 0 q40.0 -7 80.0 0 t80.0 0 q40.0 -7 80.0 0 t80.0 0 q40.0 -7 80.0 0 t80.0 0 q40.0 -7 80.0 0 t80.0 0" stroke="#1E6BFF" stroke-width="2.5" fill="none"/></g><g class="wave2" opacity=".6"><path d="M0 12 q55.0 -5 110.0 0 t110.0 0 q55.0 -5 110.0 0 t110.0 0 q55.0 -5 110.0 0 t110.0 0 q55.0 -5 110.0 0 t110.0 0 q55.0 -5 110.0 0 t110.0 0 q55.0 -5 110.0 0 t110.0 0 q55.0 -5 110.0 0 t110.0 0 q55.0 -5 110.0 0 t110.0 0 q55.0 -5 110.0 0 t110.0 0 q55.0 -5 110.0 0 t110.0 0" stroke="#7FE3FF" stroke-width="1.5" fill="none"/></g></svg>

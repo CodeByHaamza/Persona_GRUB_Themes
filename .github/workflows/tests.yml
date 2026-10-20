@@ -36,3 +36,6 @@ jobs:
 
       - name: Icons match each character's colour
         run: python tools/recolor_icons.py --check
+
+      - name: GRUB keeps the artwork's proportions
+        run: python tools/fix_aspect.py --check

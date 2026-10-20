@@ -59,6 +59,54 @@ python3 tools/check_contrast.py --fix    # rewrite theme.txt where it fails
 
 Thresholds: menu ≥ 4.5, selected ≥ 3.0, progress bar ≥ 3.0.
 
+### `recolor_icons.py`
+
+Gives the 102 distribution icons the colour of each theme's character, taken
+from `fg_color` in `theme.txt`. It darkens or lightens that colour where the
+logo would not be readable on it, and writes the icons as indexed PNG.
+
+```bash
+python3 tools/recolor_icons.py --all
+python3 tools/recolor_icons.py --theme persona3_reload/makoto
+python3 tools/recolor_icons.py --check    # what the CI runs
+```
+
+### `fix_aspect.py`
+
+Stops GRUB stretching the artwork. By default GRUB scales `desktop-image` to
+the edges of the screen, which distorts every background that is not exactly
+the screen's ratio. This writes `desktop-image-scale-method: "padding"` into
+each `theme.txt`, with a `desktop-color` sampled from the edges of the artwork
+so the band blends in rather than showing black.
+
+```bash
+python3 tools/fix_aspect.py --all
+python3 tools/fix_aspect.py --check       # what the CI runs
+```
+
+---
+
+## Adding a theme
+
+### `new_theme.py`
+
+Builds a whole theme from one All-Out Attack illustration: it takes an existing
+theme as a template, swaps the artwork in, and recolours the selection bars and
+the 102 icons to the character's colour. That colour is read off the
+illustration unless `--accent` says otherwise.
+
+```bash
+python3 tools/new_theme.py --game persona5_phantom_x --name blitz \
+    --art blitz.png --from wonder
+python3 tools/check_contrast.py --fix
+python3 tools/fix_aspect.py --all
+python3 tools/prev.py --theme persona5_phantom_x/blitz
+```
+
+Every theme must be built on an **official All-Out Attack image**: see the
+Golden Rule in [`ROADMAP.md`](../ROADMAP.md) and credit the source in
+[`SOURCES.md`](../SOURCES.md).
+
 ---
 
 ## Previews
@@ -133,6 +181,8 @@ cd themes && ../tools/generate_theme_txt.sh persona5_phantom_x && cd ..
 cd themes && ../tools/copy_select_images.sh && cd ..
 python3 tools/change_colors.py themes/persona5_phantom_x
 python3 tools/check_contrast.py --fix
+python3 tools/recolor_icons.py --all
+python3 tools/fix_aspect.py --all
 python3 tools/prev.py --all          # ~40 min without KVM
 python3 tools/readme_assets.py
 ```

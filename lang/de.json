@@ -36,6 +36,7 @@
   "velvet_question": "Einen „Velvet Room“-Eintrag hinzufügen, der die UEFI-Einstellungen öffnet? [j/N]: ",
   "os_prober_question": "GRUB die anderen installierten Systeme erkennen lassen (Windows…)? [j/N]: ",
   "os_prober_enabled": "Die anderen Systeme erscheinen im Menü.",
+  "icon_color_done": "%d System-Logos auf %s neu eingefärbt.",
   "aborted": "Abgebrochen.",
   "success": "Installation abgeschlossen!",
   "reboot_needed": "Starte neu, um die Änderung zu sehen.",

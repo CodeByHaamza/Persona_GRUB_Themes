@@ -93,8 +93,11 @@ def fit_contrast(bg, logo, minimum=MIN_ICON):
     """Assombrit ou éclaircit le fond jusqu'à ce que le logo soit lisible dessus"""
     if contrast(bg, logo) >= minimum:
         return bg
-    # vers le noir si le logo est clair, vers le blanc s'il est sombre
-    target = (0, 0, 0) if luminance(logo) > luminance(bg) else (255, 255, 255)
+    # Vers le noir si le logo est clair, vers le blanc s'il est sombre. On se
+    # fie à la luminance du logo seul : la comparer à celle du fond échoue
+    # quand les deux sont égales, et on repart alors vers le blanc sous un logo
+    # blanc, ce qui n'arrange rien.
+    target = (0, 0, 0) if luminance(logo) > 0.5 else (255, 255, 255)
     best = bg
     for step in range(1, 101):
         factor = step / 100

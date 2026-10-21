@@ -546,10 +546,10 @@ Tried, so the next person does not have to:
 - [ ] Packages (AUR, COPR, Nix) and posts (Reddit, Pling): they should wait for the new images.
 
 ### Can be done without Hamza (next PRs)
-- [ ] CI workflow running `tools/check_contrast.py` and checking that every theme folder is complete.
+- [x] CI workflow running `tools/check_contrast.py` and checking that every theme folder is complete — `.github/workflows/tests.yml` runs it on every pull request, alongside `recolor_icons.py --check`, `fix_aspect.py --check` and `add_scrollbar.py --check`, and `tests/test_themes.py` checks each folder has everything its `theme.txt` refers to.
 - [x] Scrollbar pixmaps, one set per theme in the character's colour (`tools/add_scrollbar.py`), rather than per game ([4.3](#43-game-styled-ui)).
 - [x] Installer: os-prober prompt ([5.4](#54-dual-boot)) and `--random`. TUI still open.
-- [ ] Translations of the README ([8.3](#83-translations)).
+- [ ] Translations of the README ([8.3](#83-translations)). Worth deciding how first: the gallery of 78 themes is injected into `README.md` by `tools/readme_assets.py` between `<!-- gallery:... -->` markers, so a translated copy would either lose the gallery or go stale the next time the assets are rebuilt. The tool needs to know about the translated files before the translations are worth writing.
 
 ---
 

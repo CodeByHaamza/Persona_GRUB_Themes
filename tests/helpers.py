@@ -46,6 +46,10 @@ class FakeSystemTest(unittest.TestCase):
             mock.patch.object(install, "check_root", lambda: None),
             mock.patch.object(install, "clear_screen", lambda: None),
             mock.patch.object(install.subprocess, "run", lambda cmd, check=False: self.calls.append(cmd)),
+            # Le faux système n'a aucun binaire : sans ça, la question
+            # os-prober apparaît ou non selon la machine qui lance les tests,
+            # et les réponses scriptées ne tombent plus en face.
+            mock.patch.object(install.shutil, "which", lambda name: None),
             # Interface stylée désactivée : les tests passent par les menus numérotés
             mock.patch.object(install, "install_ui", None),
         ]

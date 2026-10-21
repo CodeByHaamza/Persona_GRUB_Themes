@@ -239,6 +239,8 @@ sudo python3 install.py --restore          # restore /etc/default/grub as it was
 sudo python3 install.py --theme joker -y   # no questions (scripts)
 sudo python3 install.py --plain            # simple numbered menus
 sudo python3 install.py --shuffle-time     # a random theme, picked by a tarot card
+sudo python3 install.py --random           # a random theme, straight away
+sudo python3 install.py --os-prober        # let GRUB find your other systems (dual-boot)
 sudo python3 install.py --lang fr          # en, fr, de, es, it, pt
 sudo python3 install.py --velvet-room      # add the Velvet Room entry (see below)
 python3 install.py --ventoy /media/usb     # install on a Ventoy USB drive (see below)

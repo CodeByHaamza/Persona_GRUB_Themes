@@ -288,7 +288,7 @@ Until the build pipeline ([6](#6-repository-structure--build-pipeline)) exists: 
 - [ ] Install the matching background size (see [2.4](#24-multiple-resolutions-and-aspect-ratios)).
 
 ### 5.4 Dual-boot
-- [ ] Offer to enable `os-prober` (`GRUB_DISABLE_OS_PROBER=false`). Many dual-boot users do not see Windows in the menu.
+- [x] Offer to enable `os-prober` (`GRUB_DISABLE_OS_PROBER=false`). Many dual-boot users do not see Windows in the menu. The installer asks when `os-prober` is installed but switched off, and `--os-prober` does it without asking.
 
 ### 5.4b Velvet Room entry
 - [x] `--velvet-room`: a "Velvet Room (UEFI Firmware Settings)" GRUB entry (`fwsetup`) with a butterfly icon, offered by the interactive installer on UEFI machines.
@@ -547,8 +547,8 @@ Tried, so the next person does not have to:
 
 ### Can be done without Hamza (next PRs)
 - [ ] CI workflow running `tools/check_contrast.py` and checking that every theme folder is complete.
-- [ ] Scrollbar pixmaps for each game ([4.3](#43-game-styled-ui)).
-- [ ] Installer: os-prober prompt ([5.4](#54-dual-boot)), `--random`, TUI.
+- [x] Scrollbar pixmaps, one set per theme in the character's colour (`tools/add_scrollbar.py`), rather than per game ([4.3](#43-game-styled-ui)).
+- [x] Installer: os-prober prompt ([5.4](#54-dual-boot)) and `--random`. TUI still open.
 - [ ] Translations of the README ([8.3](#83-translations)).
 
 ---

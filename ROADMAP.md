@@ -111,7 +111,7 @@ All P5X backgrounds carry the Chinese logo and the `©[2023] Perfect World` line
 ## 2. Image Quality
 
 ### 2.1 Fix the distorted themes first
-- [ ] Replace or re-crop the 13 themes listed in [1.2](#12-wrong-aspect-ratio--stretched-characters).
+- [x] ~~Replace or re-crop the 13 themes~~ — solved without touching the artwork: GRUB is told to keep its proportions ([1.2](#12-wrong-aspect-ratio--stretched-characters)).
 
 **How to integrate:** find a 16:9 version of the same AOA image (see 2.2). If only the wide version exists, **pad** it to 16:9 (extend the background color/pattern above and below) instead of stretching it. Never stretch.
 
@@ -150,7 +150,7 @@ All P5X backgrounds carry the Chinese logo and the `©[2023] Perfect World` line
 - [ ] Optimise every PNG (`oxipng -o 4 --strip safe`), or use high-quality JPEG (GRUB supports `.jpg`) for backgrounds. Expect 50–70 % smaller backgrounds and faster boots.
 
 ### 2.6 SOURCES.md
-- [ ] Create `SOURCES.md` with, for each theme: game, character, outfit, AOA image source (link), **game the image was extracted from** (when different, e.g. Kotone Shiomi from P5X), extraction method, original resolution, upscaled yes/no.
+- [~] [`SOURCES.md`](SOURCES.md) exists and credits every theme added or re-sourced since it was written (the 12 new P5X ones, Kotone, Fuuka). The other 66 still need their line, with, for each theme: game, character, outfit, AOA image source (link), **game the image was extracted from** (when different, e.g. Kotone Shiomi from P5X), extraction method, original resolution, upscaled yes/no.
 
 ---
 
@@ -194,7 +194,7 @@ The Starlight outfits come from P5X, so they go in `persona5_phantom_x/`. P5R ke
 | `wind_vast`, `mont_music` | to check (personadle files: `Wind_V`, `Mount_Ice` / `Mount_Wind`) | keep until checked |
 
 - [x] Rename the variants to their official names (folders, previews, display names in `install.py`). The old names still work with `install.py --theme`, and `--uninstall` also removes themes installed under an old name.
-- [ ] Add the 12 missing themes above, extracted in high resolution from P5X.
+- [x] All 12 added, from the wiki's official All-Out Attack art rather than extracted from P5X — the bundles are encrypted. See [`SOURCES.md`](SOURCES.md).
 - [ ] Keep the list up to date: each new P5X character or outfit added to personadle → a new theme here.
 - [ ] For each one, find its official AOA finisher image → add it.
 - [ ] Same for **new outfits** (seasonal, collab, event): each outfit with its own AOA becomes a variant (`<name>_<outfit>`), like the existing `wonder_summer`, `rin_cny`, etc.
@@ -206,7 +206,7 @@ The Starlight outfits come from P5X, so they go in `persona5_phantom_x/`. P5R ke
 
 ### 3.3 Persona 3 Reload
 - [ ] All party members are in. Re-source `shinji`, `kotone`, `fuuka`.
-- [ ] **Kotone Shiomi** (P3 female protagonist, not Kotone Montagne / Mont from P5X): no need for the P3P FeMC mod anymore. She is in Persona 5: The Phantom X, so her official All-Out Attack is extracted from P5X. The theme **stays in `persona3_reload/`**; `SOURCES.md` notes that the image comes from P5X.
+- [x] **Kotone Shiomi** now uses her official All-Out Attack from Persona 5: The Phantom X, replacing the fan-made image. (Not Kotone Montagne / Mont from P5X.) Her official All-Out Attack is extracted from P5X. The theme **stays in `persona3_reload/`**; `SOURCES.md` notes that the image comes from P5X.
 - [ ] **Fuuka**: she is also in Persona 5: The Phantom X → extract her official All-Out Attack from P5X. The current background is 1000×430 and stretched, so this is a big upgrade. The theme stays in `persona3_reload/`.
 - [ ] Same idea for other characters that appear in several games: the theme stays in its original game, and the image comes from whichever game has the best official All-Out Attack.
 - [ ] **Episode Aigis**: check for AOA finishers that differ from the base game.
@@ -244,7 +244,7 @@ Until the build pipeline ([6](#6-repository-structure--build-pipeline)) exists: 
 - [x] Contrast checker: `tools/check_contrast.py` (`--fix` corrects `theme.txt`). Still to wire into CI (see [7.1](#71-theme-validation)).
 
 ### 4.2 Per-character colours
-- [ ] Use each character's own colour for the selection bar, progress bar and icons (green icons for Oracle, teal for Fuuka…), instead of one colour per game.
+- [x] Each character's own colour on the selection bar, the progress bar, the 102 icons and the scrollbar, instead of one colour per game.
 - [x] Fix the swapped progress bar colours (red on P3R, blue on P5X): they now use each character's selection colour.
 - [x] Fix the `junpei` icon set.
 
@@ -254,7 +254,7 @@ Until the build pipeline ([6](#6-repository-structure--build-pipeline)) exists: 
 - [ ] **P5 / P5R / P5X**: slanted (parallelogram) selection bar, red / black / white, like the in-game menus.
 - [ ] **P3R**: blue "water" style selection bar.
 - [ ] **P4 Revival**: yellow / black with a TV-static touch.
-- [ ] Matching **scrollbar pixmaps** (`scrollbar_frame` / `scrollbar_thumb`) for each game.
+- [x] **Scrollbar pixmaps** (`scrollbar_frame` / `scrollbar_thumb`) — one set per *theme* in the character's colour, which is finer than per game (`tools/add_scrollbar.py`).
 
 ### 4.4 Countdown text
 - [ ] Replace "Your OS will be booted in %d seconds" with a short themed line per game (P5: *"Taking your heart in %d…"*, P3R: *"Memento Mori — %d"*). Keep a plain English fallback option in the installer.
@@ -381,7 +381,7 @@ Persona_GRUB_Themes/
 ```
 
 ### 6.3 Steps
-- [ ] Publish the existing scripts (`change_colors.py`, `generate_theme_txt.sh`, `prev.py`) under `tools/` and remove them from `.gitignore`.
+- [x] The build scripts are published under `tools/` and no longer git-ignored.
 - [ ] Write `characters.yaml` from the current 68 themes.
 - [ ] Write `tools/build.py` (theme.txt from a template + recoloured shared assets + background crops + preview).
 - [ ] Move shared files to `shared/`; have `build.py` (or `install.py`) assemble each theme. This removes ~8,000 duplicated files.
@@ -401,7 +401,7 @@ Persona_GRUB_Themes/
   - languages: same keys and placeholders in the 6 files
   - interface: rendering, previews, Dark Hour, and a real run in a pseudo-terminal
   - `pyflakes` and `tools/check_contrast.py`
-- [ ] GitHub Action on every PR:
+- [~] GitHub Action on every PR — running already: every `theme.txt` parses and its files exist, a preview exists per theme, menu contrast, icons on-colour, proportions kept, scrollbars present, lint and the full test suite. Still missing from the list below: the resolution check and `characters.yaml`.
   - every `theme.txt` parses and every referenced file exists,
   - background ≥ 1920×1080 and the correct aspect ratio,
   - a preview exists for each theme,
@@ -410,7 +410,7 @@ Persona_GRUB_Themes/
   - `python3 -m py_compile install.py` and a `--dry-run` in a container.
 
 ### 7.2 Real GRUB previews
-- [ ] Generate the previews with **real GRUB**: `grub-mkrescue` an ISO with the theme → boot it in headless QEMU → `screendump`. The previews then match exactly what users get.
+- [x] The previews are generated with **real GRUB**: `tools/prev.py` builds an ISO with `grub-mkrescue`, boots it in headless QEMU and takes a `screendump`. They match exactly what users get.
 
 ### 7.3 personadle tracking
 - [x] Weekly GitHub Action (`.github/workflows/personadle-sync.yml` + `tools/personadle_sync.py`): every official All-Out Attack listed in personadle without a theme here gets a "[Missing theme]" issue, never twice.
@@ -477,7 +477,7 @@ Matching themes for every step of the boot, built from the same official AOA ima
 
 - [ ] State clearly in the README / LICENSE that **MIT covers the code only**; all artwork remains © ATLUS / © SEGA (and © Perfect World for P5X).
 - [ ] **Never remove copyright lines** from official images.
-- [ ] Credit every rip / source in `SOURCES.md`.
+- [~] [`SOURCES.md`](SOURCES.md) credits every source used since it was created; the 66 older themes still need theirs.
 - [ ] Stay non-commercial.
 
 ---
@@ -513,7 +513,7 @@ Matching themes for every step of the boot, built from the same official AOA ima
 These items need files or actions that are not in the repository. Each one should land as its own PR.
 
 ### Needs the private scripts
-- [ ] **Publish the dev scripts**: move `change_colors.py`, `generate_theme_txt.sh` and `prev.py` into `tools/`, remove them from `.gitignore`. Everything in [6](#6-repository-structure--build-pipeline) builds on them.
+- [x] **The dev scripts are published** in `tools/`, with `tools/README.md` documenting the chain and the order to run it in.
 - [ ] **Regenerate the previews**: the readability and progress bar fixes changed the colours of 61 themes, so `previews/` no longer matches the themes exactly. Re-run `prev.py` on every theme, then `python3 tools/readme_assets.py` to refresh the README thumbnails and the showcase GIF.
 - [ ] **Build pipeline**: turn the scripts into `tools/build.py` + `characters.yaml` (see [6.2](#62-charactersyaml-single-source-of-truth)).
 
@@ -527,7 +527,7 @@ Tried, so the next person does not have to:
 
 ### Needs the images (official All-Out Attacks only)
 - [x] **Kotone Shiomi** now uses her official P5X All-Out Attack, replacing the fan-made image ([`SOURCES.md`](SOURCES.md)). Stays in `persona3_reload/`.
-- [ ] **Fuuka** from P5X (stays in `persona3_reload/`, see [3.3](#33-persona-3-reload)).
+- [x] **Fuuka** now uses her official All-Out Attack from P5X too (1280×551, up from 1000×430). Stays in `persona3_reload/`.
 - [x] ~~**Re-source the 13 stretched themes**~~ — not needed: GRUB was told to stop stretching them instead ([1.2](#12-wrong-aspect-ratio--stretched-characters)).
 - [ ] **Re-source the low-res backgrounds** ([1.1](#11-backgrounds-below-19201080)): P5X from the Global game files, P3R `shinji` / `kotone` / `fuuka`, P5R `black_mask` / `caroline_justine` / `lavenza`.
 - [x] **All 12 missing P5X themes** added from the wiki's official All-Out Attack art ([3.1](#31-persona-5-the-phantom-x)). 68 themes → **80**.
@@ -535,7 +535,7 @@ Tried, so the next person does not have to:
 - [x] [`SOURCES.md`](SOURCES.md) created, with the source of every theme added since. The 67 older themes still need theirs filled in as they are re-sourced.
 
 ### All-Out Attack phrases
-- [ ] Each theme shows the phrase written on its All-Out Attack after the install (`THEME_QUOTES` in `install.py`). 5 are missing because the text is cut, unreadable or absent on the current image: `mont_music`, `puppet_summer`, `rin`, `vino`, `yuki`. Add them from the HD images.
+- [~] 74 of the 80 themes show the phrase written on their All-Out Attack after the install (`THEME_QUOTES` in `install.py`). 6 are missing because the text is cut, unreadable or absent on the current image: `mont_music`, `puppet_summer`, `rin`, `vino`, `yuki`. Add them from the HD images.
 
 ### personadle (the reference list)
 - [ ] Add **Wonder (Valentine)** to personadle: it has an official AOA and a theme here, but is missing from the list.

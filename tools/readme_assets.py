@@ -773,7 +773,11 @@ def update_readme():
     sys.path.insert(0, ROOT)
     with open(README) as f:
         text = f.read()
-    text = re.sub(r"(<!-- hd-progress -->).*?(<!-- /hd-progress -->)", lambda m: m.group(1) + hd_badge() + m.group(2), text)
+    # Le badge HD se repère à son URL, pas à des balises de commentaire. Une
+    # ligne qui *commence* par <!-- ouvre un bloc HTML : GitHub n'y rend plus
+    # le Markdown, et le badge disparaissait de la page.
+    text = re.sub(r"\[!\[HD artwork\]\(https://img\.shields\.io/badge/HD_artwork-[^)]*\)\]\([^)]*\)",
+                  lambda m: hd_badge(), text)
     for game in GAMES:
         pattern = re.compile(rf"(<!-- gallery:{game} -->).*?(<!-- /gallery:{game} -->)", re.S)
         text = pattern.sub(lambda m: m.group(1) + "\n" + gallery(game) + "\n" + m.group(2), text)

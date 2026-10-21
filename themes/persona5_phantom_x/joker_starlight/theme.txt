@@ -26,6 +26,11 @@ terminal-height: "100%"
   item_spacing = 40
   selected_item_pixmap_style = "select_*.png"
   menu_pixmap_style = "boot_menu_*.png"
+  scrollbar = true
+  scrollbar_width = 14
+  scrollbar_frame = "scrollbar_*.png"
+  scrollbar_thumb = "slider_*.png"
+  scrollbar_slice = "east"
 }
 #progress bar
 + progress_bar {

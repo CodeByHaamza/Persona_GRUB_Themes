@@ -84,6 +84,21 @@ python3 tools/fix_aspect.py --all
 python3 tools/fix_aspect.py --check       # what the CI runs
 ```
 
+### `add_scrollbar.py`
+
+Gives each theme a scrollbar in its character's colour. Without pixmaps GRUB
+draws its own plain grey one as soon as there are more boot entries than fit,
+which looks nothing like the theme.
+
+```bash
+python3 tools/add_scrollbar.py --all
+python3 tools/add_scrollbar.py --check    # what the CI runs
+```
+
+The slices are 1×1, like `boot_menu_c.png`. With 5×5 slices GRUB silently gives
+up on drawing the scrollbar below roughly 60 px wide, because the corners do not
+fit; at 1×1 any width works.
+
 ---
 
 ## Adding a theme
@@ -183,6 +198,7 @@ python3 tools/change_colors.py themes/persona5_phantom_x
 python3 tools/check_contrast.py --fix
 python3 tools/recolor_icons.py --all
 python3 tools/fix_aspect.py --all
+python3 tools/add_scrollbar.py --all
 python3 tools/prev.py --all          # ~40 min without KVM
 python3 tools/readme_assets.py
 ```

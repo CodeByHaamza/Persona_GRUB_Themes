@@ -17,9 +17,10 @@ is the proof of it: one line per theme, with the source its artwork came from.
 
 ### Added from the Megami Tensei Wiki
 
-These ten themes were built from the official All-Out Attack "Finishing Touch"
-illustrations hosted on the [Megami Tensei Wiki](https://megamitensei.fandom.com/),
-at 1280×551 (Pinky at 2048×881, Wonder Velvet Room at 1280×720).
+These twelve themes were built from the official All-Out Attack illustrations
+hosted on the [Megami Tensei Wiki](https://megamitensei.fandom.com/), at
+1280×551 (Pinky and Closer Radiance at 2048×881, Wonder Velvet Room at
+1280×720).
 
 | Theme | Character | Source file |
 |---|---|---|
@@ -33,6 +34,8 @@ at 1280×551 (Pinky at 2048×881, Wonder Velvet Room at 1280×720).
 | `wonder_shujin` | Nagisa Kamishiro | [`Wonder Shujin Finishing Touch.png`](https://megamitensei.fandom.com/wiki/File:Wonder_Shujin_Finishing_Touch.png) |
 | `chord_summer` | Ayaka Sakai | [`Ayaka's Summer finishing touch.png`](https://megamitensei.fandom.com/wiki/File:Ayaka%E2%80%99s_Summer_finishing_touch.png) |
 | `berry_summer` | Ichigo Shikano | [`Ichigo summer all out attack finisher.png`](https://megamitensei.fandom.com/wiki/File:Ichigo_summer_all_out_attack_finisher.png) |
+| `anri` | Aran Hirano | [`Anri AOA.png`](https://megamitensei.fandom.com/wiki/File:Anri_AOA.png) |
+| `closer_radiance` | Motoha Arai | [`Closer Sol AOA.png`](https://megamitensei.fandom.com/wiki/File:Closer_Sol_AOA.png) |
 
 The wiki files P5X artwork under the character's **real name**, not their
 phantom-thief codename. The mapping used to find them comes from
@@ -73,17 +76,14 @@ they are re-sourced — see
 
 ## Known gaps
 
-Two characters have an official All-Out Attack but no theme yet, because no
-usable still of it has been found:
+None. Every character that personadle lists with an official All-Out Attack
+now has a theme.
 
-| Character | What exists | Why it is not enough |
-|---|---|---|
-| **Anri** (Aran Hirano) | `P5X Anri promo art.jpeg`, 3840×2160 | Promotional art, not an All-Out Attack. The Golden Rule forbids passing it off as one. |
-| **Closer Radiance** (Motoha Arai, "Closer Sol") | `Motoha Sol all out attack render.png`, 1280×1113 | A cut-out character render with no background or text, so not the finisher composition. |
-
-Both exist as animated captures in personadle, but only at 640×360 and 800×450
-with a capture ID burnt into the frame, which is below the quality of every
-theme here.
+Anri and Closer Radiance were the last two. They were missing here for a
+while because the wiki files them under names the search did not turn up:
+Anri's page is `Anri AOA.png`, and Closer Radiance is called **Closer Sol**
+in English, so its file is `Closer Sol AOA.png`. Both are the full finisher
+composition, and the Closer Sol one is 2048×881.
 
 ---
 

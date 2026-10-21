@@ -101,11 +101,13 @@ CHARACTER_COLORS = {
     "miku":     BG_CYAN,
     "pinky":    BG_PINK,
     "mona":     BG_CYAN,
+    "anri":     BG_BLUE,
 
     # Variantes dont la couleur s'écarte de celle du personnage de base
-    "wonder_velvet":  BG_BLUE,
-    "berry_summer":   BG_BLUE,
-    "mona_starlight": BG_BLUE
+    "wonder_velvet":   BG_BLUE,
+    "berry_summer":    BG_BLUE,
+    "mona_starlight":  BG_BLUE,
+    "closer_radiance": BG_YELLOW
 }
 
 # --- NOMS D'AFFICHAGE SPÉCIAUX ---
@@ -132,7 +134,8 @@ CHARACTER_DISPLAY_NAMES = {
     "wonder_velvet":     "Wonder (Velvet Room)",
     "wonder_shujin":     "Wonder (Shujin)",
     "chord_summer":      "Chord (Summer)",
-    "berry_summer":      "Berry (Summer)"
+    "berry_summer":      "Berry (Summer)",
+    "closer_radiance":   "Closer (Radiance)"
 }
 
 # --- ANCIENS NOMS DE DOSSIERS ---

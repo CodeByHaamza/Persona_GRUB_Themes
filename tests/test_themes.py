@@ -89,12 +89,15 @@ class PersonadleSyncTest(unittest.TestCase):
   { nom: "Joker ( Ren Amamiya )", gif: "Joker", opus: ["P5"] },
   { nom: "Makoto Yuki", gif: "Yuki", opus: ["P3"] },
   { nom: "Anri ( Aran Hirano )", gif: "Anri", opus: ["P5X"] },
+  { nom: "Nobody At All", gif: "Nobody", opus: ["P5X"] },
 ];'''
         characters = personadle_sync.parse(sample)
-        self.assertEqual([c["folder"] for c in characters], ["joker", "makoto", "anri"])
+        self.assertEqual([c["folder"] for c in characters],
+                         ["joker", "makoto", "anri", "nobody"])
         self.assertEqual(characters[2]["game"], "persona5_phantom_x")
+        # Seul l'inventé manque : les trois autres ont leur thème, Anri comprise
         missing = [c["folder"] for c in characters if c["folder"] not in personadle_sync.existing_themes()]
-        self.assertEqual(missing, ["anri"])
+        self.assertEqual(missing, ["nobody"])
 
 
 if __name__ == "__main__":

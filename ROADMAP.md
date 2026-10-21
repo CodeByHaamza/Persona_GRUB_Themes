@@ -162,11 +162,11 @@ All P5X backgrounds carry the Chinese logo and the `©[2023] Perfect World` line
 
 **Reference list:** [personadle / allOutAttackMode](https://github.com/CodeByHaamza/personadle/tree/main/allOutAttackMode) has the official All-Out Attack of 80 characters and outfits (P3, P5, P5X). Its images are 800×450 animations, too small for GRUB, but they confirm **which official AOAs exist**, and the last frame shows which art to extract in high resolution from the game.
 
-Compared with the original 68 themes, every P3 and P5 character was already in, and **12 P5X themes were missing**, all with an official AOA. **10 of them have now been added** from the official “Finishing Touch” illustrations on the [Megami Tensei Wiki](https://megamitensei.fandom.com/) — see [`SOURCES.md`](SOURCES.md). The wiki files P5X art under the character's **real name**, not their codename, which is what personadle's mapping is for.
+Compared with the original 68 themes, every P3 and P5 character was already in, and **12 P5X themes were missing**, all with an official AOA. **all 12 have now been added** from the official “Finishing Touch” illustrations on the [Megami Tensei Wiki](https://megamitensei.fandom.com/) — see [`SOURCES.md`](SOURCES.md). The wiki files P5X art under the character's **real name**, not their codename, which is what personadle's mapping is for.
 
 | New theme | Folder | Type |
 |---|---|---|
-| Anri (Aran Hirano) | `anri` ❌ | New Phantom Idol |
+| Anri (Aran Hirano) | `anri` ✅ | New Phantom Idol |
 | Pinky (Narumi Nashimoto) | `pinky` ✅ | New Phantom Idol |
 | Blitz (Kumi Katayama) | `blitz` ✅ | New Phantom Idol |
 | Miku (Hatsune Miku) | `miku` ✅ | Collaboration |
@@ -175,13 +175,13 @@ Compared with the original 68 themes, every P3 and P5 character was already in, 
 | Panther (Starlight) | `panther_starlight` ✅ | P5 character, P5X outfit |
 | Wonder (Velvet) | `wonder_velvet` ✅ | Outfit (different from Valentine) |
 | Wonder (Shujin) | `wonder_shujin` ✅ | Outfit |
-| Closer (Radiance) | `closer_radiance` ❌ | Outfit |
+| Closer (Radiance) | `closer_radiance` ✅ | Outfit |
 | Chord (Summer) | `chord_summer` ✅ | Outfit |
 | Berry (Summer) | `berry_summer` ✅ | Outfit |
 
-The Starlight outfits come from P5X, so they go in `persona5_phantom_x/`. P5R keeps the original outfits. The collection is now at **78 themes**.
+The Starlight outfits come from P5X, so they go in `persona5_phantom_x/`. P5R keeps the original outfits. The collection is now at **80 themes**.
 
-❌ **Anri** and **Closer (Radiance)** are still missing, and deliberately so. Anri only has promotional art on the wiki, not an All-Out Attack, and the Golden Rule forbids passing one off as the other. Closer Radiance (“Closer Sol” in English) only has a cut-out character render with no background or text. Both exist as animated captures in personadle, but at 640×360 and 800×450 with a capture ID burnt into the frame, below the quality of every theme here. See [`SOURCES.md`](SOURCES.md#known-gaps).
+✅ **Anri** and **Closer (Radiance)** were the last two, and they are in. The wiki files them under names the search had missed: Anri's is `Anri AOA.png`, and Closer Radiance is called **Closer Sol** in English, so its file is `Closer Sol AOA.png` — 2048×881, the biggest of the twelve. See [`SOURCES.md`](SOURCES.md).
 
 **Official outfit names:** personadle uses the official names (checked on lufel.net). Some current folders use datamine or approximate names. They are the same outfits, checked image by image:
 
@@ -529,7 +529,7 @@ Tried, so the next person does not have to:
 - [ ] **Fuuka** from P5X (stays in `persona3_reload/`, see [3.3](#33-persona-3-reload)).
 - [x] ~~**Re-source the 13 stretched themes**~~ — not needed: GRUB was told to stop stretching them instead ([1.2](#12-wrong-aspect-ratio--stretched-characters)).
 - [ ] **Re-source the low-res backgrounds** ([1.1](#11-backgrounds-below-19201080)): P5X from the Global game files, P3R `shinji` / `kotone` / `fuuka`, P5R `black_mask` / `caroline_justine` / `lavenza`.
-- [x] **10 of the 12 missing P5X themes** added from the wiki's official Finishing Touch art ([3.1](#31-persona-5-the-phantom-x)). Still missing: **Anri** (only promo art exists) and **Closer Radiance** (only a cut-out render) — see [`SOURCES.md`](SOURCES.md#known-gaps).
+- [x] **All 12 missing P5X themes** added from the wiki's official All-Out Attack art ([3.1](#31-persona-5-the-phantom-x)). 68 themes → **80**.
 - [ ] **Persona 4 Revival** on release, from its official AOAs ([3.4](#34-persona-4-revival-)).
 - [x] [`SOURCES.md`](SOURCES.md) created, with the source of every theme added since. The 67 older themes still need theirs filled in as they are re-sourced.
 

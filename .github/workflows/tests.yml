@@ -39,3 +39,6 @@ jobs:
 
       - name: GRUB keeps the artwork's proportions
         run: python tools/fix_aspect.py --check
+
+      - name: Every theme has its scrollbar
+        run: python tools/add_scrollbar.py --check

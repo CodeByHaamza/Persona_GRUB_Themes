@@ -8,6 +8,7 @@ import random
 import argparse
 import datetime
 import subprocess
+import zlib
 
 import install_i18n
 from install_i18n import t
@@ -108,6 +109,24 @@ CHARACTER_COLORS = {
     "berry_summer":    BG_BLUE,
     "mona_starlight":  BG_BLUE,
     "closer_radiance": BG_YELLOW
+}
+
+# --- COULEURS D'ICÔNES PROPOSÉES ---
+# Raccourcis pour --icon-color. N'importe quel #RRGGBB marche aussi : la liste
+# est là pour ne pas avoir à chercher un code hexadécimal.
+ICON_COLORS = {
+    "red":     (0xEE, 0x24, 0x24),  # le rouge de Persona 5
+    "blue":    (0x32, 0x98, 0xEB),  # le bleu de Persona 3
+    "yellow":  (0xE3, 0xC8, 0x00),  # le jaune de Persona 4
+    "green":   (0x12, 0xC4, 0x84),
+    "purple":  (0x9B, 0x59, 0xD0),
+    "pink":    (0xE0, 0x4A, 0x90),
+    "orange":  (0xF0, 0x7B, 0x1E),
+    "cyan":    (0x16, 0xB8, 0xC8),
+    "white":   (0xEC, 0xE9, 0xDB),
+    "black":   (0x1A, 0x1A, 0x1A),
+    "grey":    (0x6E, 0x6E, 0x6E),
+    "gray":    (0x6E, 0x6E, 0x6E),
 }
 
 # --- NOMS D'AFFICHAGE SPÉCIAUX ---
@@ -564,6 +583,128 @@ def update_grub_binary(cmd):
         print(f"\n{BG_RED} ERROR {C_RESET} Failed to update GRUB.")
         return False
 
+# --- COULEUR DES ICÔNES ---
+# Les icônes sont des PNG indexés : leur palette est un dégradé entre la couleur
+# du fond et celle du logo. Les recolorer ne demande donc pas de toucher aux
+# pixels, seulement de réécrire la palette, ce que la bibliothèque standard sait
+# faire. Pas de dépendance à installer avant de pouvoir changer la couleur.
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+
+def png_chunks(data):
+    """(type, contenu) de chaque chunk du PNG"""
+    offset = len(PNG_SIGNATURE)
+    while offset < len(data):
+        length = int.from_bytes(data[offset:offset + 4], "big")
+        kind = data[offset + 4:offset + 8]
+        yield kind, data[offset + 8:offset + 8 + length]
+        offset += 12 + length
+
+def build_png(chunks):
+    out = bytearray(PNG_SIGNATURE)
+    for kind, payload in chunks:
+        out += len(payload).to_bytes(4, "big") + kind + payload
+        out += zlib.crc32(kind + payload).to_bytes(4, "big")
+    return bytes(out)
+
+def relative_luminance(rgb):
+    channels = []
+    for value in rgb[:3]:
+        value /= 255
+        channels.append(value / 12.92 if value <= 0.03928
+                        else ((value + 0.055) / 1.055) ** 2.4)
+    return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
+
+def contrast_ratio(a, b):
+    la, lb = relative_luminance(a), relative_luminance(b)
+    high, low = max(la, lb), min(la, lb)
+    return (high + 0.05) / (low + 0.05)
+
+def readable_on(background, logo, minimum=3.0):
+    """Rapproche le fond du noir ou du blanc jusqu'à ce que le logo s'y lise"""
+    if contrast_ratio(background, logo) >= minimum:
+        return background
+    # On s'éloigne du logo, pas du fond : comparer les deux luminances échoue
+    # quand elles sont égales, et on repart alors vers le blanc sous un logo
+    # blanc, ce qui n'arrange rien.
+    target = (0, 0, 0) if relative_luminance(logo) > 0.5 else (255, 255, 255)
+    candidate = background
+    for step in range(1, 101):
+        factor = step / 100
+        candidate = tuple(round(background[i] + (target[i] - background[i]) * factor)
+                          for i in range(3))
+        if contrast_ratio(candidate, logo) >= minimum:
+            break
+    return candidate
+
+def recolor_icon(path, new_background):
+    """Réécrit la palette d'une icône pour poser le logo sur une autre couleur"""
+    with open(path, "rb") as f:
+        data = f.read()
+    if not data.startswith(PNG_SIGNATURE):
+        return False
+    chunks = list(png_chunks(data))
+    palette = next((payload for kind, payload in chunks if kind == b"PLTE"), None)
+    if not palette or len(palette) < 6:
+        return False  # pas indexée : rien à faire
+
+    colors = [tuple(palette[i:i + 3]) for i in range(0, len(palette), 3)]
+    # Les entrées sont alignées entre le fond et le logo : les deux extrémités
+    # sont les deux couleurs les plus éloignées l'une de l'autre.
+    first, second = max(((a, b) for i, a in enumerate(colors) for b in colors[i + 1:]),
+                        key=lambda pair: sum((pair[0][i] - pair[1][i]) ** 2 for i in range(3)),
+                        default=(colors[0], colors[0]))
+    # Le logo est blanc ou noir : c'est l'extrémité la plus proche de l'un des deux
+    def extremity(color):
+        return min(sum((color[i] - ref[i]) ** 2 for i in range(3))
+                   for ref in ((255, 255, 255), (0, 0, 0)))
+    logo, background = (first, second) if extremity(first) < extremity(second) else (second, first)
+
+    vector = [logo[i] - background[i] for i in range(3)]
+    denominator = sum(v * v for v in vector)
+    if denominator == 0:
+        return False
+    target = readable_on(new_background, logo)
+
+    out = bytearray()
+    for color in colors:
+        ratio = sum((color[i] - background[i]) * vector[i] for i in range(3)) / denominator
+        ratio = 0.0 if ratio < 0 else (1.0 if ratio > 1 else ratio)
+        for i in range(3):
+            out.append(round(target[i] + (logo[i] - target[i]) * ratio))
+
+    chunks = [(kind, bytes(out) if kind == b"PLTE" else payload) for kind, payload in chunks]
+    with open(path, "wb") as f:
+        f.write(build_png(chunks))
+    return True
+
+def recolor_installed_icons(target_path, new_background):
+    """Repeint les icônes du thème qu'on vient d'installer"""
+    icons_dir = os.path.join(target_path, "icons")
+    if not os.path.isdir(icons_dir):
+        return 0
+    done = 0
+    for name in sorted(os.listdir(icons_dir)):
+        if name.endswith(".png") and recolor_icon(os.path.join(icons_dir, name), new_background):
+            done += 1
+    return done
+
+def parse_color(value):
+    """#RRGGBB, RRGGBB ou un nom de la liste, vers (r, g, b)"""
+    key = value.strip().lower()
+    if key in ICON_COLORS:
+        return ICON_COLORS[key]
+    key = key.lstrip("#")
+    if len(key) == 3:
+        key = "".join(c * 2 for c in key)
+    if len(key) != 6:
+        raise argparse.ArgumentTypeError(
+            "use #RRGGBB or one of: %s" % ", ".join(sorted(ICON_COLORS)))
+    try:
+        return tuple(int(key[i:i + 2], 16) for i in (0, 2, 4))
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            "use #RRGGBB or one of: %s" % ", ".join(sorted(ICON_COLORS)))
+
 # --- VELVET ROOM ---
 def is_uefi():
     return os.path.isdir(EFI_DIR)
@@ -587,18 +728,25 @@ def remove_velvet_room():
     print(f"Removed the Velvet Room entry ({VELVET_ROOM_SCRIPT})")
 
 # --- ACTIONS ---
-def install_theme(source_path, grub_dir, cmd, velvet_room=False):
+def install_theme(source_path, grub_dir, cmd, velvet_room=False, icon_color=None):
     themes_target = os.path.join(grub_dir, "themes")
     target_path = os.path.join(themes_target, os.path.basename(source_path))
 
     if DRY_RUN:
         print(f"{BG_YELLOW} DRY RUN {C_RESET} Would copy {source_path} -> {target_path}")
+        if icon_color:
+            print(f"{BG_YELLOW} DRY RUN {C_RESET} Would repaint the OS logos on #%02X%02X%02X"
+                  % icon_color)
     else:
         os.makedirs(themes_target, exist_ok=True)
         print(f"Copying files to {target_path}...")
         if os.path.exists(target_path):
             shutil.rmtree(target_path)
         shutil.copytree(source_path, target_path)
+        # Seule la copie installée change : le thème du dépôt garde sa couleur
+        if icon_color:
+            count = recolor_installed_icons(target_path, icon_color)
+            print(t("icon_color_done") % (count, "#%02X%02X%02X" % icon_color))
 
     if velvet_room:
         install_velvet_room()
@@ -789,6 +937,10 @@ def parse_args():
                         help="pick a random theme straight away, without the Shuffle Time animation")
     parser.add_argument("--os-prober", action="store_true",
                         help="let GRUB detect the other systems installed (dual-boot)")
+    parser.add_argument("--icon-color", metavar="COLOR", type=parse_color,
+                        help="background colour of the OS logos: #RRGGBB or one of "
+                             + ", ".join(sorted(ICON_COLORS))
+                             + " (default: the character's own colour)")
     parser.add_argument("--dry-run", action="store_true", help="show what would change without touching anything")
     parser.add_argument("-y", "--yes", action="store_true", help="do not ask for confirmation or reboot")
     return parser.parse_args()
@@ -930,7 +1082,7 @@ def main():
         enable_os_prober()
         print(t("os_prober_enabled"))
 
-    if not install_theme(final_path, grub_dir, cmd, velvet_room):
+    if not install_theme(final_path, grub_dir, cmd, velvet_room, args.icon_color):
         sys.exit(1)
 
     if DRY_RUN:

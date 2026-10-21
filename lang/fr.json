@@ -36,6 +36,7 @@
   "velvet_question": "Ajouter une entrée « Velvet Room » qui ouvre les réglages UEFI ? [o/N] : ",
   "os_prober_question": "Laisser GRUB détecter les autres systèmes installés (Windows…) ? [o/N] : ",
   "os_prober_enabled": "Les autres systèmes apparaîtront dans le menu.",
+  "icon_color_done": "%d logos de système repeints sur %s.",
   "aborted": "Annulé.",
   "success": "Installation terminée !",
   "reboot_needed": "Redémarre pour voir le changement.",

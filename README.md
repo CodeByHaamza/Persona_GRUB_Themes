@@ -241,6 +241,7 @@ sudo python3 install.py --plain            # simple numbered menus
 sudo python3 install.py --shuffle-time     # a random theme, picked by a tarot card
 sudo python3 install.py --random           # a random theme, straight away
 sudo python3 install.py --os-prober        # let GRUB find your other systems (dual-boot)
+sudo python3 install.py --icon-color green # pick the colour behind the OS logos (see below)
 sudo python3 install.py --lang fr          # en, fr, de, es, it, pt
 sudo python3 install.py --velvet-room      # add the Velvet Room entry (see below)
 python3 install.py --ventoy /media/usb     # install on a Ventoy USB drive (see below)
@@ -252,6 +253,26 @@ The installer:
 - keeps your original `/etc/default/grub` in `/etc/default/grub.persona.orig` (never overwritten) and a timestamped backup on every change,
 - sets `GRUB_GFXMODE` to your screen resolution if you have not set one,
 - disables `GRUB_TERMINAL=console` / `GRUB_TERMINAL_OUTPUT="console"`, which prevent themes from showing.
+
+### 🎨 The colour behind the OS logos
+
+Every theme paints the 102 distribution logos in its character's colour, so Makoto's are blue and Phoebe's are green. If you would rather pick your own, `--icon-color` does it at install time:
+
+```bash
+sudo python3 install.py --theme makoto --icon-color green      # a name
+sudo python3 install.py --theme makoto --icon-color "#884400"  # or any hex colour
+```
+
+Names available: `red` `blue` `yellow` `green` `purple` `pink` `orange` `cyan` `white` `black` `grey`. Anything else goes in as `#RRGGBB`.
+
+Two things worth knowing:
+
+- **It only touches the copy GRUB uses**, in `/boot/grub/themes/`. The themes in this repository keep their own colours, so the next install starts from the character colour again.
+- **The logo stays readable.** Pick something too light for the white logos and the colour is deepened until it passes a contrast ratio of 3.0. Ask for white and you get a grey dark enough to see the logos on.
+
+The rest of the theme — the selection bar, the scrollbar, the progress bar — keeps the character's colour, so the menu still reads as that character's.
+
+> Under the hood this is cheap: the icons are indexed PNGs, so only the palette is rewritten, not the pixels. The installer does it with the standard library alone, no Pillow needed.
 
 ### 🦋 Velvet Room entry
 

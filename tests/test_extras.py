@@ -117,6 +117,56 @@ class RandomTest(FakeSystemTest):
         self.assertIn("GRUB_THEME=", self.config())
 
 
+class IconColorTest(FakeSystemTest):
+    def icon_palette(self, theme, name="ubuntu.png"):
+        path = os.path.join(self.grub_dir, "themes", theme, "icons", name)
+        data = open(path, "rb").read()
+        offset = 8
+        while offset < len(data):
+            length = int.from_bytes(data[offset:offset + 4], "big")
+            if data[offset + 4:offset + 8] == b"PLTE":
+                raw = data[offset + 8:offset + 8 + length]
+                return [tuple(raw[i:i + 3]) for i in range(0, len(raw), 3)]
+            offset += 12 + length
+        return []
+
+    def test_named_colour_repaints_the_icons(self):
+        self.run_installer("--theme", "makoto", "-y", "--icon-color", "green")
+        palette = self.icon_palette("makoto")
+        self.assertTrue(palette)
+        # le blanc du logo reste, le bleu du personnage a disparu
+        self.assertIn((255, 255, 255), palette)
+        self.assertNotIn((50, 152, 235), palette)
+
+    def test_hex_colour_is_accepted(self):
+        self.run_installer("--theme", "makoto", "-y", "--icon-color", "#884400")
+        reds = [c[0] for c in self.icon_palette("makoto")]
+        self.assertTrue(max(reds) >= 136)
+
+    def test_the_repo_copy_is_left_alone(self):
+        before = open(os.path.join(
+            install.THEMES_DIR, "persona3_reload", "makoto", "icons", "ubuntu.png"), "rb").read()
+        self.run_installer("--theme", "makoto", "-y", "--icon-color", "red")
+        after = open(os.path.join(
+            install.THEMES_DIR, "persona3_reload", "makoto", "icons", "ubuntu.png"), "rb").read()
+        self.assertEqual(before, after)
+
+    def test_without_the_option_the_icons_keep_the_character_colour(self):
+        self.run_installer("--theme", "makoto", "-y")
+        self.assertIn((50, 152, 235), self.icon_palette("makoto"))
+
+    def test_a_light_colour_is_darkened_so_the_logo_stays_readable(self):
+        # blanc pur : un logo blanc dessus serait invisible
+        self.run_installer("--theme", "makoto", "-y", "--icon-color", "#FFFFFF")
+        palette = self.icon_palette("makoto")
+        darkest = min(palette, key=lambda c: sum(c))
+        self.assertLess(sum(darkest), 3 * 255)
+
+    def test_an_unknown_colour_is_refused(self):
+        with self.assertRaises(SystemExit):
+            self.run_installer("--theme", "makoto", "-y", "--icon-color", "mauve-ish")
+
+
 class QuotesTest(unittest.TestCase):
     def test_quotes_and_arcana_match_existing_themes(self):
         data = install.scan_themes()

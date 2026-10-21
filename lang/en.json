@@ -32,6 +32,8 @@
   "target": "Target",
   "proceed": "Proceed with installation? [Y/n]: ",
   "velvet_question": "Add a 'Velvet Room' entry to open the UEFI firmware settings? [y/N]: ",
+  "os_prober_question": "Let GRUB detect the other systems installed (Windows…)? [y/N]: ",
+  "os_prober_enabled": "Other systems will show up in the menu.",
   "aborted": "Aborted.",
   "success": "Installation complete!",
   "reboot_needed": "You need to reboot to see the changes.",

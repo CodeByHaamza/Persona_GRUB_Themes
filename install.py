@@ -510,6 +510,41 @@ def remove_theme_from_config():
     new_lines = ["#" + line if line.strip().startswith("GRUB_THEME=") else line for line in lines]
     write_grub_config(lines, new_lines)
 
+# --- OS-PROBER (DUAL-BOOT) ---
+def os_prober_available():
+    """os-prober est installé mais désactivé : proposer de l'activer a du sens.
+    Depuis GRUB 2.06 il est coupé par défaut, donc une ligne absente = désactivé."""
+    if not shutil.which("os-prober"):
+        return False
+    try:
+        with open(GRUB_CONFIG_FILE, 'r') as f:
+            lines = f.readlines()
+    except OSError:
+        return False
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("GRUB_DISABLE_OS_PROBER="):
+            return config_value(stripped).lower() != "false"
+    return True
+
+def enable_os_prober():
+    """Laisse GRUB détecter les autres systèmes (Windows et compagnie)"""
+    with open(GRUB_CONFIG_FILE, 'r') as f:
+        lines = f.readlines()
+    new_lines = []
+    done = False
+    for line in lines:
+        if line.strip().startswith("GRUB_DISABLE_OS_PROBER="):
+            new_lines.append("GRUB_DISABLE_OS_PROBER=false\n")
+            done = True
+        else:
+            new_lines.append(line)
+    if new_lines and not new_lines[-1].endswith("\n"):
+        new_lines[-1] += "\n"
+    if not done:
+        new_lines.append("GRUB_DISABLE_OS_PROBER=false\n")
+    write_grub_config(lines, new_lines)
+
 def update_grub_binary(cmd):
     print_header("Updating GRUB Binary...", BG_BLUE)
     if not cmd:
@@ -700,11 +735,20 @@ def print_quote(theme_path, theme_name, fancy=False):
         game = os.path.basename(os.path.dirname(theme_path))
         print(f"\n  {C_ITALIC}{C_BOLD}{GAME_QUOTES.get(game, 'Enjoy your Persona GRUB Theme!')}{C_RESET}")
 
+def all_theme_paths(data):
+    return [path for characters in data.values()
+            for variants in characters.values() for path in variants.values()]
+
 def shuffle_pick(data):
     """Shuffle Time sans l'interface stylée : un thème au hasard"""
-    paths = [path for characters in data.values() for variants in characters.values() for path in variants.values()]
-    path = random.choice(paths)
+    path = random.choice(all_theme_paths(data))
     print(f"\n{BG_BLUE} SHUFFLE TIME {C_RESET} {C_BOLD}{get_display_name(os.path.basename(path))}{C_RESET}")
+    return path
+
+def random_pick(data):
+    """--random : un thème au hasard, sans la mise en scène de Shuffle Time"""
+    path = random.choice(all_theme_paths(data))
+    print(f"\n{BG_BLUE} RANDOM {C_RESET} {C_BOLD}{get_display_name(os.path.basename(path))}{C_RESET}")
     return path
 
 def select_theme_by_name(data, name):
@@ -738,6 +782,10 @@ def parse_args():
     parser.add_argument("--lang", choices=install_i18n.available(),
                         help="language of the installer (default: the system language)")
     parser.add_argument("--shuffle-time", action="store_true", help="let fate pick a random theme")
+    parser.add_argument("--random", action="store_true",
+                        help="pick a random theme straight away, without the Shuffle Time animation")
+    parser.add_argument("--os-prober", action="store_true",
+                        help="let GRUB detect the other systems installed (dual-boot)")
     parser.add_argument("--dry-run", action="store_true", help="show what would change without touching anything")
     parser.add_argument("-y", "--yes", action="store_true", help="do not ask for confirmation or reboot")
     return parser.parse_args()
@@ -797,6 +845,8 @@ def main():
     if args.ventoy:
         if args.theme:
             final_path = select_theme_by_name(data, args.theme)
+        elif args.random:
+            final_path = random_pick(data)
         elif args.shuffle_time and not fancy_ui(args):
             final_path = shuffle_pick(data)
         elif fancy_ui(args):
@@ -828,8 +878,12 @@ def main():
 
     fancy = False
     velvet_room = args.velvet_room
+    os_prober = args.os_prober
     if args.theme:
         final_path = select_theme_by_name(data, args.theme)
+        theme_name, variant_name, char_color = get_display_name(os.path.basename(final_path)), None, BG_RED
+    elif args.random:
+        final_path = random_pick(data)
         theme_name, variant_name, char_color = get_display_name(os.path.basename(final_path)), None, BG_RED
     elif args.shuffle_time and not fancy_ui(args):
         final_path = shuffle_pick(data)
@@ -865,6 +919,13 @@ def main():
             return
         if not velvet_room and is_uefi() and not os.path.exists(VELVET_ROOM_SCRIPT):
             velvet_room = install_i18n.is_yes(input(t("velvet_question")))
+        if not os_prober and os_prober_available():
+            os_prober = install_i18n.is_yes(input(t("os_prober_question")))
+
+    # Avant l'installation : un seul passage de grub-mkconfig suffit alors
+    if os_prober:
+        enable_os_prober()
+        print(t("os_prober_enabled"))
 
     if not install_theme(final_path, grub_dir, cmd, velvet_room):
         sys.exit(1)

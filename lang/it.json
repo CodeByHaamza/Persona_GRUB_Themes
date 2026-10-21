@@ -35,6 +35,8 @@
   "target": "Destinazione",
   "proceed": "Avviare l'installazione? [S/n]: ",
   "velvet_question": "Aggiungere una voce «Velvet Room» che apre le impostazioni UEFI? [s/N]: ",
+  "os_prober_question": "Lasciare che GRUB rilevi gli altri sistemi installati (Windows…)? [s/N]: ",
+  "os_prober_enabled": "Gli altri sistemi compariranno nel menù.",
   "aborted": "Annullato.",
   "success": "Installazione completata!",
   "reboot_needed": "Riavvia per vedere la modifica.",

@@ -3,6 +3,8 @@ import json
 import os
 import unittest
 
+from unittest import mock
+
 from helpers import FakeSystemTest, install
 
 
@@ -67,6 +69,52 @@ class VentoyTest(FakeSystemTest):
     def test_dry_run(self):
         self.run_installer("--ventoy", self.usb, "--theme", "joker", "--dry-run")
         self.assertFalse(os.path.exists(self.json_path))
+
+
+class OsProberTest(FakeSystemTest):
+    def test_flag_enables_it(self):
+        self.run_installer("--theme", "joker", "-y", "--os-prober")
+        self.assertIn("GRUB_DISABLE_OS_PROBER=false", self.config())
+
+    def test_existing_line_is_replaced_not_duplicated(self):
+        with open(self.cfg, "w") as f:
+            f.write(self.GRUB_CONFIG + 'GRUB_DISABLE_OS_PROBER=true\n')
+        self.run_installer("--theme", "joker", "-y", "--os-prober")
+        config = self.config()
+        self.assertIn("GRUB_DISABLE_OS_PROBER=false", config)
+        self.assertNotIn("GRUB_DISABLE_OS_PROBER=true", config)
+        self.assertEqual(config.count("GRUB_DISABLE_OS_PROBER"), 1)
+
+    def test_not_touched_without_the_flag(self):
+        self.run_installer("--theme", "joker", "-y")
+        self.assertNotIn("GRUB_DISABLE_OS_PROBER", self.config())
+
+    def test_only_offered_when_os_prober_is_installed(self):
+        # os-prober absent : pas de question, donc une seule réponse suffit
+        with mock.patch.object(install.shutil, "which", lambda name: None):
+            self.assertFalse(install.os_prober_available())
+
+    def test_already_enabled_is_not_offered_again(self):
+        with open(self.cfg, "w") as f:
+            f.write(self.GRUB_CONFIG + 'GRUB_DISABLE_OS_PROBER=false\n')
+        with mock.patch.object(install.shutil, "which", lambda name: "/usr/bin/os-prober"):
+            self.assertFalse(install.os_prober_available())
+
+    def test_offered_when_installed_and_disabled(self):
+        with mock.patch.object(install.shutil, "which", lambda name: "/usr/bin/os-prober"):
+            self.assertTrue(install.os_prober_available())
+
+
+class RandomTest(FakeSystemTest):
+    def test_random_installs_a_real_theme(self):
+        self.run_installer("--random", "-y")
+        themes = os.listdir(os.path.join(self.grub_dir, "themes"))
+        self.assertEqual(len(themes), 1)
+        self.assertTrue(self.installed(themes[0]))
+
+    def test_random_keeps_the_theme_in_the_config(self):
+        self.run_installer("--random", "-y")
+        self.assertIn("GRUB_THEME=", self.config())
 
 
 class QuotesTest(unittest.TestCase):
